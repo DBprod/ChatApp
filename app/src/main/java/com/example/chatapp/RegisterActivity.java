@@ -48,6 +48,7 @@ public class RegisterActivity extends AppCompatActivity {
                         String user_id = mAuth.getCurrentUser().getUid();
                         DatabaseReference current_user_db = mDatabase.child(user_id);
                         current_user_db.child("Name").setValue(name_content);
+
                         startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
                     }
                 }

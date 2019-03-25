@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     public FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseUser mCurrentUser;
-    private static String currentUserName;
     private DatabaseReference mDatabaseUsers;
 
     private static final String TAG = "MESSAGE";
@@ -43,13 +42,14 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
 
         editMessage = (EditText) findViewById(R.id.editMessageE);
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("Messages");
 
         mMessageList = (RecyclerView) findViewById(R.id.messageRec);
         mMessageList.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true); // makes message list start displaying from the bottom of screen
         mMessageList.setLayoutManager(linearLayoutManager);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("Messages");
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
 
 
     }
@@ -99,44 +100,20 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
 
-        /* this ValueEventListener reads and obtains the username of the currently logged in user from firebase,
-         this initializes currentUserName, and is then used in MessageViewHolder to
-         setBackgroundColor and setAlignment of each individual message2
-         */
-//        FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid())
-//                .addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        // This method is called once with the initial value and again
-//                        // whenever data at this location is updated.
-//                        String name = dataSnapshot.child("Name").getValue().toString();
-//                        Log.d(TAG, "Value is: " + name);
-//                        currentUserName = name;
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError error) {
-//                        // Failed to read value
-//                        Log.w(TAG, "Failed to read value.", error.toException());
-//                    }
-//                });
-
         FirebaseRecyclerAdapter<Message, MessageViewHolder> FBRA = new FirebaseRecyclerAdapter<Message, MessageViewHolder>(
                 Message.class,
                 R.layout.single_message_layout,
                 MessageViewHolder.class,
-                mDatabase
+                mDatabase.orderByChild("username").startAt("Daniel").endAt("Winkel")
+
         ) {
             @Override
             protected void populateViewHolder(MessageViewHolder viewHolder, Message model, int position) {
                 viewHolder.setContent(model.getContent());
                 viewHolder.setUsername(model.getUsername());
-                viewHolder.setBackgroundColor(model.getUsername());
-                viewHolder.setAlignment(model.getUsername());
-
             }
         };
-        mMessageList.setAdapter(FBRA);
+       mMessageList.setAdapter(FBRA);
 
     }
 
@@ -148,22 +125,6 @@ public class MainActivity extends AppCompatActivity {
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
             mView = itemView;
-        }
-
-        public void setBackgroundColor(String username) {
-            // if the message username is not the same as the logged in username then it is displayed in blue
-//            if(!currentUserName.equals(username)) {
-//                LinearLayout message_layout = (LinearLayout) mView.findViewById(R.id.messageLinearLayout);
-//                message_layout.setBackgroundResource(R.drawable.blue_message_shape);
-//            }
-        }
-
-        public void setAlignment(String username){
-            // if the message username is not the same as the logged in username then it is right aligned
-//            if(!currentUserName.equals(username)) {
-//                LinearLayout message_outer_layout = (LinearLayout) mView.findViewById(R.id.messageOuterLinearLayout);
-//                message_outer_layout.setGravity(5);
-//            }
         }
 
         public void setContent(String content) {
