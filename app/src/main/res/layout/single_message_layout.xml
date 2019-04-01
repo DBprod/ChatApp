@@ -13,7 +13,6 @@
               android:layout_height="100dp"
               android:layout_margin="10dp"
               android:id="@+id/messageLinearLayout"
-
               android:background="@drawable/message_shape"
     >
     <TextView
