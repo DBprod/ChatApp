@@ -6,14 +6,18 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,48 +53,48 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-
-
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
-
-        FirebaseRecyclerAdapter<People, UsernamesViewHolder> FBRA = new FirebaseRecyclerAdapter<People, UsernamesViewHolder>(
-                People.class,
-                R.layout.single_contact,
-                UsernamesViewHolder.class,
-                mDatabase
-
-        ) {
+        Query query = mDatabase;
+        FirebaseRecyclerOptions<People> options = new FirebaseRecyclerOptions.Builder<People>().setQuery(query, People.class).build();
+        FirebaseRecyclerAdapter<People, PeopleHolder> adapter = new FirebaseRecyclerAdapter<People, PeopleHolder>(options) {
             @Override
-            protected void populateViewHolder(UsernamesViewHolder viewHolder, People model, int position) {
-                 viewHolder.setUsername(model.getName());
-                 final String name = model.getName();
-                 viewHolder.mView.setOnClickListener(new View.OnClickListener() {
-                     @Override
-                     public void onClick(View v) {
-                         Intent viewMessagesIntent = new Intent(MainActivity.this, MessageActivity.class);
-                         viewMessagesIntent.putExtra("recieverName", name);
-                         startActivity(viewMessagesIntent);
-                     }
-                 });
+            protected void onBindViewHolder(@NonNull PeopleHolder holder, int position, @NonNull People model) {
+                holder.setUsername(model.getName());
+                final String name = model.getName();
+                final String uid = model.getUid();
+                holder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent viewMessagesIntent = new Intent(MainActivity.this, MessageActivity.class);
+                        viewMessagesIntent.putExtra("receiveName", name);
+                        viewMessagesIntent.putExtra("uid", uid);
+                        startActivity(viewMessagesIntent);
+                    }
+                });
+            }
 
+            @NonNull
+            @Override
+            public PeopleHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+                View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.single_contact, viewGroup, false);
+                return new PeopleHolder(view);
             }
         };
-       mContactList.setAdapter(FBRA);
-
+        mContactList.setAdapter(adapter);
+        adapter.startListening();
     }
 
-    public static class UsernamesViewHolder extends RecyclerView.ViewHolder{
+    public static class PeopleHolder extends RecyclerView.ViewHolder{
         // note this class is usually static but had to gain access to an
         View mView;
 
 
-        public UsernamesViewHolder(@NonNull View itemView) {
+        public PeopleHolder(@NonNull View itemView) {
             super(itemView);
             mView = itemView;
         }

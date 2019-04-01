@@ -3,13 +3,14 @@ package com.example.chatapp;
 public class Message {
 
     private String content;
-    private String username;
+    private int sender;
 
     public Message(){
 
     }
-    public Message(String content){
+    public Message(String content, int sender){
         this.content = content;
+        this.sender = sender;
     }
 
     public void setContent(String content, String username) {
@@ -20,11 +21,11 @@ public class Message {
         return content;
     }
 
-    public String getUsername() {
-        return username;
+    public int getSender() {
+        return sender;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setSender(int sender) {
+        this.sender = sender;
     }
 }

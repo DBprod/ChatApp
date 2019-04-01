@@ -7,11 +7,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -19,16 +22,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class MessageActivity extends AppCompatActivity {
 
-    private String reciever_name = null;
+    private String receiver_name = null;
+    private String receiver_uid = null;
     private DatabaseReference mDatabase;
     private RecyclerView mMessageList;
     private FirebaseUser mUser;
     private FirebaseUser mCurrentUser;
     private DatabaseReference mDatabaseUsers;
+    private DatabaseReference mReceiverRef;
     public FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
@@ -42,7 +48,10 @@ public class MessageActivity extends AppCompatActivity {
 
         editMessage = (EditText) findViewById(R.id.editMessageE);
 
-        reciever_name = getIntent().getExtras().getString("recieverName");
+        receiver_name = getIntent().getExtras().getString("receiverName");
+        receiver_uid = getIntent().getExtras().getString("uid");
+
+        mReceiverRef = FirebaseDatabase.getInstance().getReference().child("Users").child(receiver_uid).child("Messages");
 
         mMessageList = (RecyclerView) findViewById(R.id.messageRec);
         mMessageList.setHasFixedSize(true);
@@ -76,19 +85,19 @@ public class MessageActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         final String messageValue = editMessage.getText().toString().trim();
         if(!TextUtils.isEmpty(messageValue)){
-            final DatabaseReference newPost = mDatabase.push();
-            mDatabaseUsers.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    newPost.child("content").setValue(messageValue);
-                    newPost.child("receiver").setValue(reciever_name);
-                    newPost.child("sender").setValue(mUser.getUid());
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+            final DatabaseReference senderPost = mDatabase.push();
+            senderPost.child("content").setValue(messageValue);
+            senderPost.child("receiver").setValue(receiver_name);
+            senderPost.child("chatId").setValue(receiver_uid);
+            senderPost.child("sender").setValue(1);
 
-                }
-            });
+            final DatabaseReference receiverPost = mReceiverRef.push();
+            receiverPost.child("content").setValue(messageValue);
+            receiverPost.child("receiver").setValue(receiver_name);
+            receiverPost.child("chatId").setValue(mUser.getUid());
+            receiverPost.child("sender").setValue(0);
+
+
             mMessageList.scrollToPosition(mMessageList.getAdapter().getItemCount()); // sets the recycler view to last message
         }
     }
@@ -96,30 +105,53 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
 
-        FirebaseRecyclerAdapter<Message, MessageActivity.MessageViewHolder> FBRAMessage = new FirebaseRecyclerAdapter<Message, MessageActivity.MessageViewHolder>(
-                Message.class,
-                R.layout.single_message_layout,
-                MessageActivity.MessageViewHolder.class,
-                mDatabase.orderByChild("receiver").equalTo(reciever_name)
-
-        ) {
+        Query query = mDatabase.orderByChild("chatId").equalTo(receiver_uid);
+        FirebaseRecyclerOptions<Message> options = new FirebaseRecyclerOptions.Builder<Message>().setQuery(query, Message.class).build();
+        FirebaseRecyclerAdapter<Message, MessageHolder> adapter = new FirebaseRecyclerAdapter<Message, MessageHolder>(options) {
             @Override
-            protected void populateViewHolder(MessageActivity.MessageViewHolder viewHolder, Message model, int position) {
-               viewHolder.setUsername(model.getUsername());
-               viewHolder.setContent(model.getContent());
+            protected void onBindViewHolder(@NonNull MessageHolder holder, int position, @NonNull Message model) {
+                holder.setContent(model.getContent());
+            }
+
+            @NonNull
+            @Override
+            public MessageHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+                View view = null;
+                switch (viewType){
+                    case 0: {
+                        view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.their_chat_bubble, viewGroup, false);
+                        break;
+                    }
+                    case 1: {
+                        view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.my_chat_bubble, viewGroup, false);
+                        break;
+                    }
+                    default: {
+                        view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.my_chat_bubble, viewGroup, false);
+                        break;
+                    }
+                }
+                MessageHolder viewHolder = new MessageHolder(view);
+                return viewHolder;
+            }
+
+            @Override
+            public int getItemViewType(int position) {
+                return getItem(position).getSender();
             }
         };
-        mMessageList.setAdapter(FBRAMessage);
+
+        mMessageList.setAdapter(adapter);
+        adapter.startListening();
     }
 
-    public static class MessageViewHolder extends RecyclerView.ViewHolder{
+    public static class MessageHolder extends RecyclerView.ViewHolder{
         // note this class is usually static but had to gain access to an
         View mView;
 
 
-        public MessageViewHolder(@NonNull View itemView) {
+        public MessageHolder(@NonNull View itemView) {
             super(itemView);
             mView = itemView;
         }
@@ -127,11 +159,6 @@ public class MessageActivity extends AppCompatActivity {
         public void setContent(String content){
             TextView message_content = (TextView) mView.findViewById(R.id.messageText);
             message_content.setText(content);
-        }
-
-        public void setUsername(String username){
-            TextView username_content = (TextView) mView.findViewById(R.id.usernameText);
-            username_content.setText(username);
         }
     }
 
