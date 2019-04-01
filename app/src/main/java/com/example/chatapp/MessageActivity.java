@@ -77,7 +77,6 @@ public class MessageActivity extends AppCompatActivity {
                 }
             }
         };
-
     }
 
     public void sendButtonClicked(View view) {
@@ -89,18 +88,18 @@ public class MessageActivity extends AppCompatActivity {
         if(!TextUtils.isEmpty(messageValue)){
             final DatabaseReference senderPost = mDatabase.push();
             senderPost.child("content").setValue(messageValue);
-            senderPost.child("receiver").setValue(receiver_name);
             senderPost.child("chatId").setValue(receiver_uid);
             senderPost.child("sender").setValue(1);
 
             final DatabaseReference receiverPost = mReceiverRef.push();
             receiverPost.child("content").setValue(messageValue);
-            receiverPost.child("receiver").setValue(receiver_name);
             receiverPost.child("chatId").setValue(mUser.getUid());
             receiverPost.child("sender").setValue(0);
         }
 
-        mReceiverRef.addChildEventListener(new ChildEventListener() {
+        editMessage.setText("");
+
+        mDatabase.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 mMessageList.smoothScrollToPosition(mMessageList.getAdapter().getItemCount());
@@ -126,7 +125,6 @@ public class MessageActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     @Override

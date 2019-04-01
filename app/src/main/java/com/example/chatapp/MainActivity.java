@@ -65,13 +65,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull PeopleHolder holder, int position, @NonNull People model) {
                 holder.setUsername(model.getName());
-                final String name = model.getName();
                 final String uid = model.getUid();
                 holder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent viewMessagesIntent = new Intent(MainActivity.this, MessageActivity.class);
-                        viewMessagesIntent.putExtra("receiveName", name);
                         viewMessagesIntent.putExtra("uid", uid);
                         startActivity(viewMessagesIntent);
                     }
