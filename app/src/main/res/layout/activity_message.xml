@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-   >
+    >
 
     <Button
         android:layout_width="wrap_content"
@@ -16,11 +16,33 @@
         />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/contactRec"
+        android:id="@+id/messageRec"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/msgLinearLayout"
         android:layout_marginBottom="0dp">
 
+
     </android.support.v7.widget.RecyclerView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/msgLinearLayout"
+        >
+
+        <EditText
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/editMessageE"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="sendButtonClicked"
+            android:text="send"/>
+
+    </LinearLayout>
+
 
 </RelativeLayout>

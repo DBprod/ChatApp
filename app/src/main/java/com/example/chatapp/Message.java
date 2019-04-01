@@ -12,7 +12,7 @@ public class Message {
         this.content = content;
     }
 
-    public void setContent(String content, String Username) {
+    public void setContent(String content, String username) {
         this.content = content;
     }
 
