@@ -77,27 +77,6 @@ public class MessageActivity extends AppCompatActivity {
                 }
             }
         };
-    }
-
-    public void sendButtonClicked(View view) {
-        mCurrentUser = mAuth.getCurrentUser();
-        mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
-
-        FirebaseApp.initializeApp(this);
-        final String messageValue = editMessage.getText().toString().trim();
-        if(!TextUtils.isEmpty(messageValue)){
-            final DatabaseReference senderPost = mDatabase.push();
-            senderPost.child("content").setValue(messageValue);
-            senderPost.child("chatId").setValue(receiver_uid);
-            senderPost.child("sender").setValue(1);
-
-            final DatabaseReference receiverPost = mReceiverRef.push();
-            receiverPost.child("content").setValue(messageValue);
-            receiverPost.child("chatId").setValue(mUser.getUid());
-            receiverPost.child("sender").setValue(0);
-        }
-
-        editMessage.setText("");
 
         mDatabase.addChildEventListener(new ChildEventListener() {
             @Override
@@ -125,6 +104,27 @@ public class MessageActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void sendButtonClicked(View view) {
+        mCurrentUser = mAuth.getCurrentUser();
+        mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
+
+        FirebaseApp.initializeApp(this);
+        final String messageValue = editMessage.getText().toString().trim();
+        if(!TextUtils.isEmpty(messageValue)){
+            final DatabaseReference senderPost = mDatabase.push();
+            senderPost.child("content").setValue(messageValue);
+            senderPost.child("chatId").setValue(receiver_uid);
+            senderPost.child("sender").setValue(1);
+
+            final DatabaseReference receiverPost = mReceiverRef.push();
+            receiverPost.child("content").setValue(messageValue);
+            receiverPost.child("chatId").setValue(mUser.getUid());
+            receiverPost.child("sender").setValue(0);
+        }
+
+        editMessage.setText("");
     }
 
     @Override

@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
                         checkUserExists();
                     }
                     else {
-                        Toast.makeText(LoginActivity.this, "Invalid Logig", Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this, "Invalid Login", Toast.LENGTH_LONG).show();
                     }
                 }
             });

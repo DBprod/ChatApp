@@ -57,6 +57,6 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
     public void loginButtonClicked(View view){
-        startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
+        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
     }
 }
