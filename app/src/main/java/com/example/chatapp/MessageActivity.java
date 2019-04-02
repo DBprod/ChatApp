@@ -39,6 +39,7 @@ public class MessageActivity extends AppCompatActivity {
     private DatabaseReference mReceiverRef;
     public FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    FirebaseRecyclerAdapter<Message, MessageHolder> adapter;
 
     private EditText editMessage;
 
@@ -106,34 +107,13 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    public void sendButtonClicked(View view) {
-        mCurrentUser = mAuth.getCurrentUser();
-        mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
-
-        FirebaseApp.initializeApp(this);
-        final String messageValue = editMessage.getText().toString().trim();
-        if(!TextUtils.isEmpty(messageValue)){
-            final DatabaseReference senderPost = mDatabase.push();
-            senderPost.child("content").setValue(messageValue);
-            senderPost.child("chatId").setValue(receiver_uid);
-            senderPost.child("sender").setValue(1);
-
-            final DatabaseReference receiverPost = mReceiverRef.push();
-            receiverPost.child("content").setValue(messageValue);
-            receiverPost.child("chatId").setValue(mUser.getUid());
-            receiverPost.child("sender").setValue(0);
-        }
-
-        editMessage.setText("");
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
 
         Query query = mDatabase.orderByChild("chatId").equalTo(receiver_uid);
         FirebaseRecyclerOptions<Message> options = new FirebaseRecyclerOptions.Builder<Message>().setQuery(query, Message.class).build();
-        FirebaseRecyclerAdapter<Message, MessageHolder> adapter = new FirebaseRecyclerAdapter<Message, MessageHolder>(options) {
+        adapter = new FirebaseRecyclerAdapter<Message, MessageHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull MessageHolder holder, int position, @NonNull Message model) {
                 holder.setContent(model.getContent());
@@ -171,6 +151,12 @@ public class MessageActivity extends AppCompatActivity {
         adapter.startListening();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
+
     public static class MessageHolder extends RecyclerView.ViewHolder{
         // note this class is usually static but had to gain access to an
         View mView;
@@ -189,5 +175,26 @@ public class MessageActivity extends AppCompatActivity {
 
     public void signOutBtnClicked(View view){
         mAuth.signOut();
+    }
+
+    public void sendButtonClicked(View view) {
+        mCurrentUser = mAuth.getCurrentUser();
+        mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
+
+        FirebaseApp.initializeApp(this);
+        final String messageValue = editMessage.getText().toString().trim();
+        if(!TextUtils.isEmpty(messageValue)){
+            final DatabaseReference senderPost = mDatabase.push();
+            senderPost.child("content").setValue(messageValue);
+            senderPost.child("chatId").setValue(receiver_uid);
+            senderPost.child("sender").setValue(1);
+
+            final DatabaseReference receiverPost = mReceiverRef.push();
+            receiverPost.child("content").setValue(messageValue);
+            receiverPost.child("chatId").setValue(mUser.getUid());
+            receiverPost.child("sender").setValue(0);
+        }
+
+        editMessage.setText("");
     }
 }

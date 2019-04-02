@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mContactList;
     public FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseRecyclerAdapter<People, PeopleHolder> adapter;
 
     private static final String TAG = "MESSAGE";
 
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(mAuthListener);
         Query query = mDatabase;
         FirebaseRecyclerOptions<People> options = new FirebaseRecyclerOptions.Builder<People>().setQuery(query, People.class).build();
-        FirebaseRecyclerAdapter<People, PeopleHolder> adapter = new FirebaseRecyclerAdapter<People, PeopleHolder>(options) {
+        adapter = new FirebaseRecyclerAdapter<People, PeopleHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull PeopleHolder holder, int position, @NonNull People model) {
                 holder.setUsername(model.getName());
@@ -85,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
         };
         mContactList.setAdapter(adapter);
         adapter.startListening();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
 
     public static class PeopleHolder extends RecyclerView.ViewHolder{
