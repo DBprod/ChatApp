@@ -78,33 +78,6 @@ public class MessageActivity extends AppCompatActivity {
                 }
             }
         };
-
-        mDatabase.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                mMessageList.smoothScrollToPosition(mMessageList.getAdapter().getItemCount());
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
 
     @Override
@@ -149,6 +122,33 @@ public class MessageActivity extends AppCompatActivity {
 
         mMessageList.setAdapter(adapter);
         adapter.startListening();
+
+        mDatabase.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                mMessageList.smoothScrollToPosition(mMessageList.getAdapter().getItemCount());
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -184,11 +184,12 @@ public class MessageActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         final String messageValue = editMessage.getText().toString().trim();
         if(!TextUtils.isEmpty(messageValue)){
+            //send message to yourself
             final DatabaseReference senderPost = mDatabase.push();
             senderPost.child("content").setValue(messageValue);
             senderPost.child("chatId").setValue(receiver_uid);
             senderPost.child("sender").setValue(1);
-
+            //send message to other
             final DatabaseReference receiverPost = mReceiverRef.push();
             receiverPost.child("content").setValue(messageValue);
             receiverPost.child("chatId").setValue(mUser.getUid());
