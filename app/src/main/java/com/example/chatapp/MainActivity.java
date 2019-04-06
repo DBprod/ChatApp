@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         mContactList = (RecyclerView) findViewById(R.id.contactRec);
         mContactList.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setStackFromEnd(true); // makes message list start displaying from the bottom of screen
+       // linearLayoutManager.setStackFromEnd(true); // makes message list start displaying from the bottom of screen
         mContactList.setLayoutManager(linearLayoutManager);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
