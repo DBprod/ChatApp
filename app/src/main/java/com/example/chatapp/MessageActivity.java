@@ -9,6 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -25,7 +27,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -78,6 +79,8 @@ public class MessageActivity extends AppCompatActivity {
                 }
             }
         };
+
+        getSupportActionBar().setTitle(receiver_name+"");
     }
 
     @Override
@@ -173,10 +176,6 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
-    public void signOutBtnClicked(View view){
-        mAuth.signOut();
-    }
-
     public void sendButtonClicked(View view) {
         mCurrentUser = mAuth.getCurrentUser();
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
@@ -198,4 +197,23 @@ public class MessageActivity extends AppCompatActivity {
 
         editMessage.setText("");
     }
+
+    // create an action bar button
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.mymenu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    // handle button activities
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.logoutBtn) {
+            mAuth.signOut();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }
