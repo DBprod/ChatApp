@@ -40,9 +40,7 @@ public class Encryptor {
     public static String encrypt(String message, BigInteger[] publicKey){
         BigInteger messageInt = new BigInteger(message.getBytes());
         BigInteger cipherInt = messageInt.modPow(publicKey[1], publicKey[0]);
-        String cipherText = new String(cipherInt.toByteArray());
-        return cipherText;
-
+        return cipherInt.toString();
     }
 
     public static BigInteger decrypt(BigInteger cipher, BigInteger[] publicKey, BigInteger privateKey){

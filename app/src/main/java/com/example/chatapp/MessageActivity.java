@@ -204,9 +204,10 @@ public class MessageActivity extends AppCompatActivity {
 
         FirebaseApp.initializeApp(this);
         final String messageValue = editMessage.getText().toString().trim();
-        final String myEncryptedMessage = Encryptor.encrypt(messageValue, myPublicKey);
-        final String receiverEncryptedMessage = Encryptor.encrypt(messageValue, receiverPublicKey);
         if(!TextUtils.isEmpty(messageValue)){
+            final String myEncryptedMessage = Encryptor.encrypt(messageValue, myPublicKey);
+            final String receiverEncryptedMessage = Encryptor.encrypt(messageValue, receiverPublicKey);
+
             //send message to yourself
             final DatabaseReference senderPost = mDatabase.push();
             senderPost.child("content").setValue(myEncryptedMessage);
