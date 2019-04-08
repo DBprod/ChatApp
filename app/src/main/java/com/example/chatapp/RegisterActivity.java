@@ -52,8 +52,6 @@ public class RegisterActivity extends AppCompatActivity {
                         current_user_db.child("name").setValue(name_content);
                         current_user_db.child("uid").setValue(mAuth.getUid());
 
-<<<<<<< HEAD
-=======
                         BigInteger[] primes = Encryptor.generatePrimes();
                         BigInteger[] publicKey = Encryptor.generatePublicKey(primes[0], primes[1]);
 
@@ -61,9 +59,7 @@ public class RegisterActivity extends AppCompatActivity {
                         publicKeyRef.child("mod").setValue(publicKey[0].toString());
                         publicKeyRef.child("exp").setValue(publicKey[1].toString());
 
-
->>>>>>> 37c078991e981c166927ce65042ceffe661679f8
-                        startActivity(new Intent(RegisterActivity.this,MainActivity.class));
+                        startActivity(new Intent(RegisterActivity.this, PrivateKeyActivity.class));
                     }
                 }
             });
