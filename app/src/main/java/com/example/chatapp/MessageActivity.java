@@ -27,11 +27,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.math.BigInteger;
 
 public class MessageActivity extends AppCompatActivity {
 
     private String receiver_name = null;
     private String receiver_uid = null;
+    private DatabaseReference senderDatabase;
     private DatabaseReference mDatabase;
     private RecyclerView mMessageList;
     private FirebaseUser mUser;
@@ -40,6 +44,8 @@ public class MessageActivity extends AppCompatActivity {
     private DatabaseReference mReceiverRef;
     public FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private BigInteger[] myPublicKey = new BigInteger[2];
+    private BigInteger[] receiverPublicKey =  new BigInteger[2];
     FirebaseRecyclerAdapter<Message, MessageHolder> adapter;
 
     private EditText editMessage;
@@ -65,8 +71,24 @@ public class MessageActivity extends AppCompatActivity {
 
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid()).child("Messages");
+        senderDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
+        mDatabase = senderDatabase.child("Messages");
 
+        senderDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                myPublicKey[0] = new BigInteger(dataSnapshot.child("mod").getValue().toString().getBytes());
+                myPublicKey[1] = new BigInteger(dataSnapshot.child("exp").getValue().toString().getBytes());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        receiverPublicKey[0] = new BigInteger(getIntent().getExtras().getString("receiverMod").getBytes());
+        receiverPublicKey[1] = new BigInteger(getIntent().getExtras().getString("receiverExp").getBytes());
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -182,17 +204,19 @@ public class MessageActivity extends AppCompatActivity {
 
         FirebaseApp.initializeApp(this);
         final String messageValue = editMessage.getText().toString().trim();
+        final String myEncryptedMessage = Encryptor.encrypt(messageValue, myPublicKey);
+        final String receiverEncryptedMessage = Encryptor.encrypt(messageValue, receiverPublicKey);
         if(!TextUtils.isEmpty(messageValue)){
             //send message to yourself
             final DatabaseReference senderPost = mDatabase.push();
-            senderPost.child("content").setValue(messageValue);
+            senderPost.child("content").setValue(myEncryptedMessage);
             senderPost.child("chatId").setValue(receiver_uid);
             senderPost.child("sender").setValue(1);
             //send message to other
 
             if(!receiver_uid.equals(mCurrentUser.getUid())) {
                 final DatabaseReference receiverPost = mReceiverRef.push();
-                receiverPost.child("content").setValue(messageValue);
+                receiverPost.child("content").setValue(receiverEncryptedMessage);
                 receiverPost.child("chatId").setValue(mUser.getUid());
                 receiverPost.child("sender").setValue(0);
             }

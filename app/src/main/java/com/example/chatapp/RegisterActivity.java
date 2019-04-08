@@ -56,9 +56,8 @@ public class RegisterActivity extends AppCompatActivity {
                         BigInteger[] publicKey = Encryptor.generatePublicKey(primes[0], primes[1]);
 
                         // Public key logic and storing into database
-                        DatabaseReference publicKeyRef = current_user_db.child("publicKey");
-                        publicKeyRef.child("mod").setValue(publicKey[0].toString());
-                        publicKeyRef.child("exp").setValue(publicKey[1].toString());
+                        current_user_db.child("mod").setValue(publicKey[0].toString());
+                        current_user_db.child("exp").setValue(publicKey[1].toString());
 
                         //Generating private key to send to the private key activity
                         String privateKey = Encryptor.generatePrivateKey(publicKey, primes[0], primes[1]).toString();

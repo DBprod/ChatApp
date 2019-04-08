@@ -37,8 +37,23 @@ public class Encryptor {
         return message.modPow(publicKey[1], publicKey[0]);
     }
 
+    public static String encrypt(String message, BigInteger[] publicKey){
+        BigInteger messageInt = new BigInteger(message.getBytes());
+        BigInteger cipherInt = messageInt.modPow(publicKey[1], publicKey[0]);
+        String cipherText = new String(cipherInt.toByteArray());
+        return cipherText;
+
+    }
+
     public static BigInteger decrypt(BigInteger cipher, BigInteger[] publicKey, BigInteger privateKey){
         return cipher.modPow(privateKey, publicKey[0]);
+    }
+
+    public static String decrypt(String cipherText, BigInteger[] publicKey, BigInteger privateKey){
+        BigInteger cipherInt = new BigInteger(cipherText.getBytes());
+        BigInteger decipherInt = cipherInt.modPow(privateKey, publicKey[0]);
+        String decipherText = new String(decipherInt.toByteArray());
+        return decipherText;
     }
 
     private static BigInteger gcd(BigInteger a,BigInteger b){

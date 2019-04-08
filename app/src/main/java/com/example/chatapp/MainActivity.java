@@ -72,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull PeopleHolder holder, int position, @NonNull People model) {
                 holder.setUsername(model.getName());
                 final String uid = model.getUid();
+                final String receiverExp = model.getExp();
+                final String receiverMod = model.getMod();
+
                 final String receiverName = model.getName();
                 holder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -79,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
                         Intent viewMessagesIntent = new Intent(MainActivity.this, MessageActivity.class);
                         viewMessagesIntent.putExtra("uid", uid);
                         viewMessagesIntent.putExtra("receiverName", receiverName);
+                        viewMessagesIntent.putExtra("receiverMod", receiverMod);
+                        viewMessagesIntent.putExtra("receiverExp", receiverExp);
                         startActivity(viewMessagesIntent);
                     }
                 });
