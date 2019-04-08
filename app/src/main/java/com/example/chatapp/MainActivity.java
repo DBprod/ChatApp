@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         mContactList = (RecyclerView) findViewById(R.id.contactRec);
         mContactList.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setStackFromEnd(true); // makes message list start displaying from the bottom of screen
+       // linearLayoutManager.setStackFromEnd(true); // makes message list start displaying from the bottom of screen
         mContactList.setLayoutManager(linearLayoutManager);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -55,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
+        getSupportActionBar().setTitle("Your Messages");
     }
 
     @Override
@@ -68,11 +72,13 @@ public class MainActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull PeopleHolder holder, int position, @NonNull People model) {
                 holder.setUsername(model.getName());
                 final String uid = model.getUid();
+                final String receiverName = model.getName();
                 holder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent viewMessagesIntent = new Intent(MainActivity.this, MessageActivity.class);
                         viewMessagesIntent.putExtra("uid", uid);
+                        viewMessagesIntent.putExtra("receiverName", receiverName);
                         startActivity(viewMessagesIntent);
                     }
                 });
@@ -112,9 +118,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void signOutBtnClicked(View view){
-        mAuth.signOut();
+    // create an action bar button
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.mymenu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
+
+    // handle button activities
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.logoutBtn) {
+            mAuth.signOut();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
 
 }

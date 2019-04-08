@@ -7,15 +7,31 @@
     android:layout_height="match_parent"
    >
 
-    <Button
+    <TextView
+        android:id="@+id/pageTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sign Out"
-        android:layout_alignParentRight="true"
-        android:onClick="signOutBtnClicked"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="15dp"
+        android:fontFamily="sans-serif-condensed-light"
+        android:text="Encrypted Message App"
+        android:textSize="35dp"
         />
 
+    <TextView
+        android:id="@+id/appDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pageTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:text="Encrypt your message through RSA public key cryptography"
+        android:textAlignment="center"/>
+
     <android.support.v7.widget.RecyclerView
+        android:layout_below="@+id/appDescription"
+        android:background="@drawable/contact_list_shape"
         android:id="@+id/contactRec"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
