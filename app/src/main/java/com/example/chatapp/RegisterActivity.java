@@ -66,6 +66,7 @@ public class RegisterActivity extends AppCompatActivity {
                         Intent privateKeyIntent = new Intent(RegisterActivity.this,MainActivity.class);
                         privateKeyIntent.putExtra("privateKey", privateKey);
                         startActivity(privateKeyIntent);
+                        startActivity(new Intent(RegisterActivity.this, PrivateKeyActivity.class));
                     }
                 }
             });
