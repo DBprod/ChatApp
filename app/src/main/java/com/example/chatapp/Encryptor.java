@@ -47,8 +47,8 @@ public class Encryptor {
         return cipher.modPow(privateKey, publicKey[0]);
     }
 
-    public static String decrypt(String cipherText, BigInteger[] publicKey, BigInteger privateKey){
-        BigInteger cipherInt = new BigInteger(cipherText.getBytes());
+    public static String decrypt(String cipherIntString, BigInteger[] publicKey, BigInteger privateKey){
+        BigInteger cipherInt = new BigInteger(cipherIntString);
         BigInteger decipherInt = cipherInt.modPow(privateKey, publicKey[0]);
         String decipherText = new String(decipherInt.toByteArray());
         return decipherText;

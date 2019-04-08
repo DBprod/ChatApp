@@ -77,8 +77,8 @@ public class MessageActivity extends AppCompatActivity {
         senderDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                myPublicKey[0] = new BigInteger(dataSnapshot.child("mod").getValue().toString().getBytes());
-                myPublicKey[1] = new BigInteger(dataSnapshot.child("exp").getValue().toString().getBytes());
+                myPublicKey[0] = new BigInteger(dataSnapshot.child("mod").getValue().toString());
+                myPublicKey[1] = new BigInteger(dataSnapshot.child("exp").getValue().toString());
             }
 
             @Override
@@ -87,8 +87,8 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-        receiverPublicKey[0] = new BigInteger(getIntent().getExtras().getString("receiverMod").getBytes());
-        receiverPublicKey[1] = new BigInteger(getIntent().getExtras().getString("receiverExp").getBytes());
+        receiverPublicKey[0] = new BigInteger(getIntent().getExtras().getString("receiverMod"));
+        receiverPublicKey[1] = new BigInteger(getIntent().getExtras().getString("receiverExp"));
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -114,7 +114,9 @@ public class MessageActivity extends AppCompatActivity {
         adapter = new FirebaseRecyclerAdapter<Message, MessageHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull MessageHolder holder, int position, @NonNull Message model) {
-                holder.setContent(model.getContent());
+                String cipherInt = model.getContent();
+                String plainText = Encryptor.decrypt(cipherInt, myPublicKey, new BigInteger("1912620043339309883025434737449656208509737406174275932539580835577963666050348801413577911392646101364358208991867393042700191374692122942634643004648722019119545232629072591144888802012503773314650286556518558024519533951363084887115813612602596452389702471525293576493052051444580821760571518659788302844860626425197107103293486144991035385166619658301244089325717507583661952350988846185401877728614393418445015587267961976410056707754349475931747107504613256382501433419268954682675572657673676282939240655920430261746835631713102514830902414643285845286862888783206454807416777525180329622426282156259783935725"));
+                holder.setContent(plainText);
             }
 
             @NonNull
