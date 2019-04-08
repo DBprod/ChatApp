@@ -50,7 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
                         current_user_db.child("name").setValue(name_content);
                         current_user_db.child("uid").setValue(mAuth.getUid());
 
-                        startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
+                        startActivity(new Intent(RegisterActivity.this,MainActivity.class));
                     }
                 }
             });
