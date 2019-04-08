@@ -63,10 +63,9 @@ public class RegisterActivity extends AppCompatActivity {
                         //Generating private key to send to the private key activity
                         String privateKey = Encryptor.generatePrivateKey(publicKey, primes[0], primes[1]).toString();
 
-                        Intent privateKeyIntent = new Intent(RegisterActivity.this,MainActivity.class);
+                        Intent privateKeyIntent = new Intent(RegisterActivity.this, PrivateKeyActivity.class);
                         privateKeyIntent.putExtra("privateKey", privateKey);
                         startActivity(privateKeyIntent);
-                        startActivity(new Intent(RegisterActivity.this, PrivateKeyActivity.class));
                     }
                 }
             });
