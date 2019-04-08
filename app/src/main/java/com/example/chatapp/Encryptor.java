@@ -81,4 +81,3 @@ public class Encryptor {
         return inverse(mod, a, map);
     }
 }
-

@@ -15,6 +15,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.math.BigInteger;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText name,email,password;
@@ -50,6 +52,17 @@ public class RegisterActivity extends AppCompatActivity {
                         current_user_db.child("name").setValue(name_content);
                         current_user_db.child("uid").setValue(mAuth.getUid());
 
+<<<<<<< HEAD
+=======
+                        BigInteger[] primes = Encryptor.generatePrimes();
+                        BigInteger[] publicKey = Encryptor.generatePublicKey(primes[0], primes[1]);
+
+                        DatabaseReference publicKeyRef = current_user_db.child("publicKey");
+                        publicKeyRef.child("mod").setValue(publicKey[0].toString());
+                        publicKeyRef.child("exp").setValue(publicKey[1].toString());
+
+
+>>>>>>> 37c078991e981c166927ce65042ceffe661679f8
                         startActivity(new Intent(RegisterActivity.this,MainActivity.class));
                     }
                 }

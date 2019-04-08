@@ -189,10 +189,13 @@ public class MessageActivity extends AppCompatActivity {
             senderPost.child("chatId").setValue(receiver_uid);
             senderPost.child("sender").setValue(1);
             //send message to other
-            final DatabaseReference receiverPost = mReceiverRef.push();
-            receiverPost.child("content").setValue(messageValue);
-            receiverPost.child("chatId").setValue(mUser.getUid());
-            receiverPost.child("sender").setValue(0);
+
+            if(!receiver_uid.equals(mCurrentUser.getUid())) {
+                final DatabaseReference receiverPost = mReceiverRef.push();
+                receiverPost.child("content").setValue(messageValue);
+                receiverPost.child("chatId").setValue(mUser.getUid());
+                receiverPost.child("sender").setValue(0);
+            }
         }
 
         editMessage.setText("");
