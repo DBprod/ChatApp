@@ -29,4 +29,12 @@
         android:onClick="loginButtonClicked"
         android:text="Login"
         />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFFFF"
+        android:onClick="forgotPasswordBtnClicked"
+        android:text="Forgot Password?"
+        android:textColor="@color/colorAccent"/>
 </LinearLayout>

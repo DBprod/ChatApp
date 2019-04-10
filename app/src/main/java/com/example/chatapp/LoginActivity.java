@@ -70,4 +70,19 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void forgotPasswordBtnClicked(View view){
+       final String userEmail = loginEmail.getText().toString().trim();
+       mAuth.sendPasswordResetEmail(userEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
+           @Override
+           public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+                    Toast.makeText(LoginActivity.this, "Password Reset Email Sent To: "+ userEmail, Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(LoginActivity.this, "Password Reset Email Was NOT Sent", Toast.LENGTH_LONG).show();
+                }
+           }
+       });
+    }
 }
