@@ -1,6 +1,8 @@
 package com.example.chatapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -21,13 +23,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-public class MainActivity extends AppCompatActivity {
+import java.math.BigInteger;
+
+public class MainActivity extends AppCompatActivity implements PrivateKeyDialog.PrivateKeyDialogListener{
 
     private DatabaseReference mDatabase;
     private RecyclerView mContactList;
     public FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseRecyclerAdapter<People, PeopleHolder> adapter;
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor prefEditor;
 
     private static final String TAG = "MESSAGE";
 
@@ -36,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FirebaseApp.initializeApp(this);
+
+        preferences = getSharedPreferences("privateKeyPreference", Context.MODE_PRIVATE);
+        prefEditor = preferences.edit();
 
         mContactList = (RecyclerView) findViewById(R.id.contactRec);
         mContactList.setHasFixedSize(true);
@@ -138,10 +147,24 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.logoutBtn) {
             mAuth.signOut();
         }
+        if (id == R.id.privateKeyInput){
+            PrivateKeyDialog privateKeyDialog = new PrivateKeyDialog();
+            privateKeyDialog.show(getSupportFragmentManager(), "private key");
+        }
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
+    @Override
+    public void applyTexts(String privateKey) {
+        privateKey = privateKey.trim();
+        try{
+            new BigInteger(privateKey);
+            prefEditor.putString("privateKey", privateKey);
+        }
+        catch(Exception e){
+            prefEditor.putString("privateKey", "0");
+        } finally {
+            prefEditor.commit();
+        }
+    }
 }

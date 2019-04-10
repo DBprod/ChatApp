@@ -1,6 +1,8 @@
 package com.example.chatapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -31,7 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.math.BigInteger;
 
-public class MessageActivity extends AppCompatActivity {
+public class MessageActivity extends AppCompatActivity implements PrivateKeyDialog.PrivateKeyDialogListener{
 
     private String receiver_name = null;
     private String receiver_uid = null;
@@ -47,6 +50,8 @@ public class MessageActivity extends AppCompatActivity {
     private BigInteger[] myPublicKey = new BigInteger[2];
     private BigInteger[] receiverPublicKey =  new BigInteger[2];
     FirebaseRecyclerAdapter<Message, MessageHolder> adapter;
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor prefEditor;
 
     private EditText editMessage;
 
@@ -55,6 +60,9 @@ public class MessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         FirebaseApp.initializeApp(this);
+
+        preferences = getSharedPreferences("privateKeyPreference", Context.MODE_PRIVATE);
+        prefEditor = preferences.edit();
 
         editMessage = (EditText) findViewById(R.id.editMessage);
 
@@ -115,7 +123,7 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull MessageHolder holder, int position, @NonNull Message model) {
                 String cipherInt = model.getContent();
-                String plainText = Encryptor.decrypt(cipherInt, myPublicKey, new BigInteger("1912620043339309883025434737449656208509737406174275932539580835577963666050348801413577911392646101364358208991867393042700191374692122942634643004648722019119545232629072591144888802012503773314650286556518558024519533951363084887115813612602596452389702471525293576493052051444580821760571518659788302844860626425197107103293486144991035385166619658301244089325717507583661952350988846185401877728614393418445015587267961976410056707754349475931747107504613256382501433419268954682675572657673676282939240655920430261746835631713102514830902414643285845286862888783206454807416777525180329622426282156259783935725"));
+                String plainText = Encryptor.decrypt(cipherInt, myPublicKey, new BigInteger(preferences.getString("privateKey", "0")));
                 holder.setContent(plainText);
             }
 
@@ -203,7 +211,6 @@ public class MessageActivity extends AppCompatActivity {
     public void sendButtonClicked(View view) {
         mCurrentUser = mAuth.getCurrentUser();
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
-
         FirebaseApp.initializeApp(this);
         final String messageValue = editMessage.getText().toString().trim();
         if(!TextUtils.isEmpty(messageValue)){
@@ -243,7 +250,22 @@ public class MessageActivity extends AppCompatActivity {
         if (id == R.id.logoutBtn) {
             mAuth.signOut();
         }
+        if (id == R.id.privateKeyInput){
+            PrivateKeyDialog privateKeyDialog = new PrivateKeyDialog();
+            privateKeyDialog.show(getSupportFragmentManager(), "private key");
+        }
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void applyTexts(String privateKey) {
+        privateKey = privateKey.trim();
+        try{
+            new BigInteger(privateKey);
+            prefEditor.putString("privateKey", privateKey);
+            prefEditor.commit();
+        }
+        catch(Exception e){
+        }
+    }
 }
