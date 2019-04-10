@@ -115,6 +115,12 @@ public class MainActivity extends AppCompatActivity implements PrivateKeyDialog.
         adapter.stopListening();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        prefEditor.clear().commit();
+    }
+
     public static class PeopleHolder extends RecyclerView.ViewHolder{
         // note this class is usually static but had to gain access to an
         View mView;
@@ -146,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements PrivateKeyDialog.
 
         if (id == R.id.logoutBtn) {
             mAuth.signOut();
+            prefEditor.putString("privateKey", null).commit();
         }
         if (id == R.id.privateKeyInput){
             PrivateKeyDialog privateKeyDialog = new PrivateKeyDialog();

@@ -249,6 +249,7 @@ public class MessageActivity extends AppCompatActivity implements PrivateKeyDial
 
         if (id == R.id.logoutBtn) {
             mAuth.signOut();
+            prefEditor.putString("privateKey", null).commit();
         }
         if (id == R.id.privateKeyInput){
             PrivateKeyDialog privateKeyDialog = new PrivateKeyDialog();
@@ -266,6 +267,8 @@ public class MessageActivity extends AppCompatActivity implements PrivateKeyDial
             prefEditor.commit();
         }
         catch(Exception e){
+        } finally {
+            adapter.notifyDataSetChanged();
         }
     }
 }
