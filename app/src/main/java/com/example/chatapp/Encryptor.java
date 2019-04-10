@@ -25,8 +25,8 @@ public class Encryptor {
     }
 
     public static BigInteger[] generatePrimes(){
-        BigInteger p = new BigInteger(1024, 10000, new Random());
-        BigInteger q = new BigInteger(1024, 10000, new Random());
+        BigInteger p = new BigInteger(1024, 10000, new Random((long)(Math.random()*10000000)));
+        BigInteger q = new BigInteger(1024, 10000, new Random((long)(Math.random()*10000000)));
         BigInteger[] primes = {p, q};
         System.out.println("Prime 1: " + p);
         System.out.println("Prime 2: " + q);
