@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/editEmail"
         android:hint="Enter email"
+        android:inputType="textEmailAddress"
         />
     <EditText
         android:layout_width="match_parent"
@@ -33,6 +34,13 @@
         android:id="@+id/editPassword"
         android:inputType="textPassword"
         android:hint="Enter password"
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/confirmPassword"
+        android:inputType="textPassword"
+        android:hint="Confirm password"
         />
     <Button
         android:layout_width="match_parent"

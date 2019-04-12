@@ -30,6 +30,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/loginEmail"
         android:hint="Enter email"
+        android:inputType="textEmailAddress"
         />
     <EditText
         android:layout_width="match_parent"

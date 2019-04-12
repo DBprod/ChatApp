@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -19,7 +20,7 @@ import java.math.BigInteger;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText name,email,password;
+    private EditText name,email,password, confirmPassword;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
 
@@ -30,19 +31,26 @@ public class RegisterActivity extends AppCompatActivity {
         name = (EditText) findViewById(R.id.editUsername);
         email = (EditText) findViewById(R.id.editEmail);
         password = (EditText) findViewById(R.id.editPassword);
+        confirmPassword = findViewById(R.id.confirmPassword);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
     }
 
     public void signupButtonClicked(View view){
 
-        final String name_content,password_content,email_content;
+        final String name_content,password_content,email_content,confirmPassword_content;
 
         name_content= name.getText().toString().trim();
         password_content = password.getText().toString().trim();
         email_content=  email.getText().toString().trim();
+        confirmPassword_content = confirmPassword.getText().toString().trim();
 
-        if (!TextUtils.isEmpty(email_content) && !TextUtils.isEmpty(name_content) && !TextUtils.isEmpty(password_content)){
+        if(!confirmPassword_content.equals(password_content)){
+            Toast.makeText(this, "Your passwords do not match", Toast.LENGTH_LONG).show();
+        }
+        else if (!TextUtils.isEmpty(email_content)
+                && !TextUtils.isEmpty(name_content)
+                && !TextUtils.isEmpty(password_content)){
             mAuth.createUserWithEmailAndPassword(email_content,password_content).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
