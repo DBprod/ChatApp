@@ -48,12 +48,15 @@ public class LoginActivity extends AppCompatActivity {
                         checkUserExists();
                     }
                     else {
-                        Toast.makeText(LoginActivity.this, "Invalid Login", Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this, "The username password is incorrect", Toast.LENGTH_LONG).show();
                     }
                 }
             });
+        } else {
+            Toast.makeText(LoginActivity.this, "Input an email and a password", Toast.LENGTH_LONG).show();
         }
     }
+
     public void checkUserExists() {
         final String user_id = mAuth.getCurrentUser().getUid();
         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -61,7 +64,9 @@ public class LoginActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(user_id)) {
                     Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
+                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); // prevents user from going back to previous activity
                     startActivity(loginIntent);
+                    finish();
                 }
 
             }
@@ -72,17 +77,26 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void forgotPasswordBtnClicked(View view){
-       final String userEmail = loginEmail.getText().toString().trim();
-       mAuth.sendPasswordResetEmail(userEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
-           @Override
-           public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    Toast.makeText(LoginActivity.this, "Password Reset Email Sent To: "+ userEmail, Toast.LENGTH_LONG).show();
+        try {
+            final String userEmail = loginEmail.getText().toString().trim();
+            mAuth.sendPasswordResetEmail(userEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()) {
+                        Toast.makeText(LoginActivity.this, "Password Reset Email Sent To: "+ userEmail, Toast.LENGTH_LONG).show();
+                    }
+                    else{
+                        Toast.makeText(LoginActivity.this, "There does not seem to be an account under this email", Toast.LENGTH_LONG).show();
+                    }
                 }
-                else{
-                    Toast.makeText(LoginActivity.this, "Password Reset Email Was NOT Sent", Toast.LENGTH_LONG).show();
-                }
-           }
-       });
+            });
+        } catch (Exception e) {
+            Toast.makeText(this, "Please input a valid email", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void createAccountBtnClicked(View view){
+        Intent loginIntent = new Intent(this, RegisterActivity.class);
+        startActivity(loginIntent);
     }
 }

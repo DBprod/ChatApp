@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:id="@+id/activity_login"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:paddingBottom="10dp"
-              android:paddingLeft="10dp"
-              android:paddingRight="10dp"
-              android:paddingTop="10dp"
-              android:background="@drawable/register_activity_background"
-              >
+      xmlns:tools="http://schemas.android.com/tools"
+      android:id="@+id/activity_login"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical"
+      android:paddingBottom="10dp"
+      android:paddingLeft="10dp"
+      android:paddingRight="10dp"
+      android:paddingTop="10dp"
+      android:background="@drawable/register_activity_background"
+      >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,14 +39,24 @@
         android:hint="Enter password"
         />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#01FFFFFF"
-            android:gravity="right"
-            android:onClick="forgotPasswordBtnClicked"
-            android:text="Forgot Password?"
-            android:textColor="#03A9F4"/>
+    <Button
+        android:layout_width="350dp"
+        android:layout_height="32dp"
+        android:background="#01FFFFFF"
+        android:gravity="right"
+        android:onClick="forgotPasswordBtnClicked"
+        android:text="Forgot Password?"
+        android:textColor="#03A9F4" />
+
+    <Button
+        android:layout_width="350dp"
+        android:layout_height="32dp"
+        android:background="#01FFFFFF"
+        android:gravity="right"
+        android:onClick="createAccountBtnClicked"
+        android:text="Create an account?"
+        android:textColor="#03A9F4" />
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
