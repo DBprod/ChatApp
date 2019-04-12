@@ -9,7 +9,7 @@
       android:paddingLeft="10dp"
       android:paddingRight="10dp"
       android:paddingTop="10dp"
-      android:background="@drawable/register_activity_background"
+      android:background="@drawable/form_activity_background"
       >
 
     <LinearLayout
@@ -21,7 +21,7 @@
         android:paddingRight="20dp"
         android:paddingTop="10dp"
         android:layout_marginTop="200dp"
-        android:background="@drawable/register_bubble_shape"
+        android:background="@drawable/form_bubble_shape"
 
         >
 

@@ -45,12 +45,15 @@ public class RegisterActivity extends AppCompatActivity {
         email_content=  email.getText().toString().trim();
         confirmPassword_content = confirmPassword.getText().toString().trim();
 
-        if(!confirmPassword_content.equals(password_content)){
+        if (TextUtils.isEmpty(email_content)
+                || TextUtils.isEmpty(name_content)
+                || TextUtils.isEmpty(password_content)){
+            Toast.makeText(this, "Please fill the sign up form", Toast.LENGTH_LONG).show();
+        }
+        else if(!confirmPassword_content.equals(password_content)){
             Toast.makeText(this, "Your passwords do not match", Toast.LENGTH_LONG).show();
         }
-        else if (!TextUtils.isEmpty(email_content)
-                && !TextUtils.isEmpty(name_content)
-                && !TextUtils.isEmpty(password_content)){
+        else{
             mAuth.createUserWithEmailAndPassword(email_content,password_content).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {

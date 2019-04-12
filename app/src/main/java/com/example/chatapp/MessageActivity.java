@@ -267,6 +267,10 @@ public class MessageActivity extends AppCompatActivity{
                 adapter.notifyDataSetChanged();
             }
         }
+        if (id == R.id.privateKeyRemove){
+            prefEditor.putString("privateKey", "1").commit();
+            adapter.notifyDataSetChanged();
+        }
         return super.onOptionsItemSelected(item);
     }
 }
