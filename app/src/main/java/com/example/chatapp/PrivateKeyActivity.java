@@ -28,7 +28,7 @@ public class PrivateKeyActivity extends AppCompatActivity {
     }
 
     public void copyTextBtnClicked(View view){
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(this.CLIPBOARD_SERVICE);
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         privateKey = getIntent().getExtras().getString("privateKey");
         ClipData clip = ClipData.newPlainText("privateKey", privateKey);
         clipboard.setPrimaryClip(clip);

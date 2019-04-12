@@ -1,5 +1,7 @@
 package com.example.chatapp;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,8 +36,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.math.BigInteger;
 
-public class MessageActivity extends AppCompatActivity implements PrivateKeyDialog.PrivateKeyDialogListener{
-
+public class MessageActivity extends AppCompatActivity{
     private String receiver_name = null;
     private String receiver_uid = null;
     private DatabaseReference senderDatabase;
@@ -252,23 +253,20 @@ public class MessageActivity extends AppCompatActivity implements PrivateKeyDial
             prefEditor.putString("privateKey", null).commit();
         }
         if (id == R.id.privateKeyInput){
-            PrivateKeyDialog privateKeyDialog = new PrivateKeyDialog();
-            privateKeyDialog.show(getSupportFragmentManager(), "private key");
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            ClipData clip = clipboard.getPrimaryClip();
+            String privateKey = clip.getItemAt(0).coerceToText(this).toString();
+            try{
+                new BigInteger(privateKey);
+                prefEditor.putString("privateKey", privateKey);
+            }
+            catch(Exception e){
+                prefEditor.putString("privateKey", "1");
+            } finally {
+                prefEditor.commit();
+                adapter.notifyDataSetChanged();
+            }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void applyTexts(String privateKey) {
-        privateKey = privateKey.trim();
-        try{
-            new BigInteger(privateKey);
-            prefEditor.putString("privateKey", privateKey);
-            prefEditor.commit();
-        }
-        catch(Exception e){
-        } finally {
-            adapter.notifyDataSetChanged();
-        }
     }
 }

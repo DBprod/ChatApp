@@ -1,5 +1,7 @@
 package com.example.chatapp;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -25,7 +28,7 @@ import com.google.firebase.database.Query;
 
 import java.math.BigInteger;
 
-public class MainActivity extends AppCompatActivity implements PrivateKeyDialog.PrivateKeyDialogListener{
+public class MainActivity extends AppCompatActivity{
 
     private DatabaseReference mDatabase;
     private RecyclerView mContactList;
@@ -115,12 +118,6 @@ public class MainActivity extends AppCompatActivity implements PrivateKeyDialog.
         adapter.stopListening();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        prefEditor.clear().commit();
-    }
-
     public static class PeopleHolder extends RecyclerView.ViewHolder{
         // note this class is usually static but had to gain access to an
         View mView;
@@ -152,26 +149,22 @@ public class MainActivity extends AppCompatActivity implements PrivateKeyDialog.
 
         if (id == R.id.logoutBtn) {
             mAuth.signOut();
-            prefEditor.putString("privateKey", null).commit();
+            prefEditor.clear().commit();
         }
         if (id == R.id.privateKeyInput){
-            PrivateKeyDialog privateKeyDialog = new PrivateKeyDialog();
-            privateKeyDialog.show(getSupportFragmentManager(), "private key");
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            ClipData clip = clipboard.getPrimaryClip();
+            String privateKey = clip.getItemAt(0).coerceToText(this).toString();
+            try{
+                new BigInteger(privateKey);
+                prefEditor.putString("privateKey", privateKey);
+            }
+            catch(Exception e){
+                prefEditor.putString("privateKey", "1");
+            } finally {
+                prefEditor.commit();
+            }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void applyTexts(String privateKey) {
-        privateKey = privateKey.trim();
-        try{
-            new BigInteger(privateKey);
-            prefEditor.putString("privateKey", privateKey);
-        }
-        catch(Exception e){
-            prefEditor.putString("privateKey", "0");
-        } finally {
-            prefEditor.commit();
-        }
     }
 }
