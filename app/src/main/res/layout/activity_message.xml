@@ -43,7 +43,8 @@
             android:background="@android:drawable/ic_menu_send"
             android:backgroundTint="#3170FA"
             android:onClick="sendButtonClicked"
-            android:padding="20dp" />
+            android:padding="20dp"
+            android:contentDescription="TODO" />
     </LinearLayout>
 
 

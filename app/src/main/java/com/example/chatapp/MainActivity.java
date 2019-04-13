@@ -1,5 +1,6 @@
 package com.example.chatapp;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity{
 
     private static final String TAG = "MESSAGE";
 
+    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

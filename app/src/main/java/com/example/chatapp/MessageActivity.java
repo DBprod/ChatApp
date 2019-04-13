@@ -124,7 +124,8 @@ public class MessageActivity extends AppCompatActivity{
             @Override
             protected void onBindViewHolder(@NonNull MessageHolder holder, int position, @NonNull Message model) {
                 String cipherInt = model.getContent();
-                String plainText = Encryptor.decrypt(cipherInt, myPublicKey, new BigInteger(preferences.getString("privateKey", "0")));
+                boolean emoji = model.isEmoji();
+                String plainText = Encryptor.decrypt(cipherInt, myPublicKey, new BigInteger(preferences.getString("privateKey", "0")), emoji);
                 holder.setContent(plainText);
             }
 
@@ -146,8 +147,7 @@ public class MessageActivity extends AppCompatActivity{
                         break;
                     }
                 }
-                MessageHolder viewHolder = new MessageHolder(view);
-                return viewHolder;
+                return new MessageHolder(view);
             }
 
             @Override
@@ -215,14 +215,21 @@ public class MessageActivity extends AppCompatActivity{
         FirebaseApp.initializeApp(this);
         final String messageValue = editMessage.getText().toString().trim();
         if(!TextUtils.isEmpty(messageValue)){
-            final String myEncryptedMessage = Encryptor.encrypt(messageValue, myPublicKey);
-            final String receiverEncryptedMessage = Encryptor.encrypt(messageValue, receiverPublicKey);
+            boolean emoji = false;
+            final BigInteger messageInt = new BigInteger(messageValue.getBytes());
+            if(messageInt.compareTo(new BigInteger("0")) == -1)
+                emoji = true;
+
+            final String myEncryptedMessage = Encryptor.encrypt(messageInt, myPublicKey).toString();
+            final String receiverEncryptedMessage = Encryptor.encrypt(messageInt, receiverPublicKey).toString();
+
 
             //send message to yourself
             final DatabaseReference senderPost = mDatabase.push();
             senderPost.child("content").setValue(myEncryptedMessage);
             senderPost.child("chatId").setValue(receiver_uid);
             senderPost.child("sender").setValue(1);
+            senderPost.child("emoji").setValue(emoji);
             //send message to other
 
             if(!receiver_uid.equals(mCurrentUser.getUid())) {
@@ -230,6 +237,7 @@ public class MessageActivity extends AppCompatActivity{
                 receiverPost.child("content").setValue(receiverEncryptedMessage);
                 receiverPost.child("chatId").setValue(mUser.getUid());
                 receiverPost.child("sender").setValue(0);
+                receiverPost.child("emoji").setValue(emoji);
             }
         }
 

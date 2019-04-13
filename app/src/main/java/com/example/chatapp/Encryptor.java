@@ -20,8 +20,7 @@ public class Encryptor {
 
     public static BigInteger generatePrivateKey(BigInteger[] publicKey, BigInteger prime1, BigInteger prime2){
         BigInteger m = prime1.subtract(new BigInteger("1")).multiply(prime2.subtract(new BigInteger("1")));
-        BigInteger privateKey = getInverse(publicKey[1], m);
-        return privateKey;
+        return getInverse(publicKey[1], m);
     }
 
     public static BigInteger[] generatePrimes(){
@@ -50,8 +49,16 @@ public class Encryptor {
     public static String decrypt(String cipherIntString, BigInteger[] publicKey, BigInteger privateKey){
         BigInteger cipherInt = new BigInteger(cipherIntString);
         BigInteger decipherInt = cipherInt.modPow(privateKey, publicKey[0]);
-        String decipherText = new String(decipherInt.toByteArray());
-        return decipherText;
+        return new String(decipherInt.toByteArray());
+    }
+
+    public static String decrypt(String cipherIntString, BigInteger[] publicKey, BigInteger privateKey, boolean isEmoji){
+        BigInteger cipherInt = new BigInteger(cipherIntString);
+        BigInteger decipherInt = cipherInt.modPow(privateKey, publicKey[0]);
+        if(isEmoji) {
+            decipherInt = decipherInt.subtract(publicKey[0]);
+        }
+        return new String(decipherInt.toByteArray());
     }
 
     private static BigInteger gcd(BigInteger a,BigInteger b){
@@ -62,14 +69,17 @@ public class Encryptor {
 
     public static BigInteger getInverse(BigInteger a, BigInteger m){
         HashMap<BigInteger, BigInteger> map = new HashMap();
-        map.put(a, new BigInteger("1"));
-        map.put(m, new BigInteger("0"));
-        BigInteger inverse = inverse(a, m, map);
-        map.clear();
-        if(inverse.compareTo(new BigInteger("0")) == -1){
-            inverse = inverse.add(m);
+        if(a instanceof BigInteger && m instanceof BigInteger) {
+            map.put(a, new BigInteger("1"));
+            map.put(m, new BigInteger("0"));
+            BigInteger inverse = inverse(a, m, map);
+            map.clear();
+            if (inverse.compareTo(new BigInteger("0")) == -1) {
+                inverse = inverse.add(m);
+            }
+            return inverse;
         }
-        return inverse;
+        return null;
     }
     private static BigInteger inverse(BigInteger a, BigInteger m, HashMap<BigInteger, BigInteger> map){ //Finds the inverse of 'a' mod 'm'
         BigInteger mod = m.mod(a);
