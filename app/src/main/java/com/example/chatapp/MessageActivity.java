@@ -118,7 +118,7 @@ public class MessageActivity extends AppCompatActivity{
     protected void onStart() {
         super.onStart();
 
-        Query query = mDatabase.orderByChild("chatId").equalTo(receiver_uid);
+        Query query = mDatabase.child(receiver_uid);
         FirebaseRecyclerOptions<Message> options = new FirebaseRecyclerOptions.Builder<Message>().setQuery(query, Message.class).build();
         adapter = new FirebaseRecyclerAdapter<Message, MessageHolder>(options) {
             @Override
@@ -225,17 +225,17 @@ public class MessageActivity extends AppCompatActivity{
 
 
             //send message to yourself
-            final DatabaseReference senderPost = mDatabase.push();
+            final DatabaseReference senderPost = mDatabase.child(receiver_uid).push();
             senderPost.child("content").setValue(myEncryptedMessage);
-            senderPost.child("chatId").setValue(receiver_uid);
+//            senderPost.child("chatId").setValue(receiver_uid);
             senderPost.child("sender").setValue(1);
             senderPost.child("emoji").setValue(emoji);
             //send message to other
 
             if(!receiver_uid.equals(mCurrentUser.getUid())) {
-                final DatabaseReference receiverPost = mReceiverRef.push();
+                final DatabaseReference receiverPost = mReceiverRef.child(mUser.getUid()).push();
                 receiverPost.child("content").setValue(receiverEncryptedMessage);
-                receiverPost.child("chatId").setValue(mUser.getUid());
+//                receiverPost.child("chatId").setValue(mUser.getUid());
                 receiverPost.child("sender").setValue(0);
                 receiverPost.child("emoji").setValue(emoji);
             }
