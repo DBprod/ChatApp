@@ -125,7 +125,7 @@ public class MessageActivity extends AppCompatActivity{
             protected void onBindViewHolder(@NonNull MessageHolder holder, int position, @NonNull Message model) {
                 String cipherInt = model.getContent();
                 boolean emoji = model.isEmoji();
-                String plainText = Encryptor.decrypt(cipherInt, myPublicKey, new BigInteger(preferences.getString("privateKey", "0")), emoji);
+                String plainText = Encryptor.decrypt(cipherInt, myPublicKey, new BigInteger(preferences.getString("privateKey", "1")), emoji);
                 holder.setContent(plainText);
             }
 
@@ -261,10 +261,10 @@ public class MessageActivity extends AppCompatActivity{
             prefEditor.putString("privateKey", null).commit();
         }
         if (id == R.id.privateKeyInput){
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            ClipData clip = clipboard.getPrimaryClip();
-            String privateKey = clip.getItemAt(0).coerceToText(this).toString();
             try{
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clip = clipboard.getPrimaryClip();
+                String privateKey = clip.getItemAt(0).coerceToText(this).toString();
                 new BigInteger(privateKey);
                 prefEditor.putString("privateKey", privateKey);
             }

@@ -154,10 +154,10 @@ public class MainActivity extends AppCompatActivity{
             prefEditor.clear().commit();
         }
         if (id == R.id.privateKeyInput){
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            ClipData clip = clipboard.getPrimaryClip();
-            String privateKey = clip.getItemAt(0).coerceToText(this).toString();
             try{
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clip = clipboard.getPrimaryClip();
+                String privateKey = clip.getItemAt(0).coerceToText(this).toString();
                 new BigInteger(privateKey);
                 prefEditor.putString("privateKey", privateKey);
             }
