@@ -31,7 +31,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.math.BigInteger;
 
@@ -219,7 +218,9 @@ public class MessageActivity extends AppCompatActivity{
 //            senderPost.child("chatId").setValue(receiver_uid);
             senderPost.child("sender").setValue(1);
             senderPost.child("emoji").setValue(emoji);
+
             //send message to other
+
 
             if(!receiver_uid.equals(mCurrentUser.getUid())) {
                 final DatabaseReference receiverPost = mReceiverRef.child(mUser.getUid()).push();
