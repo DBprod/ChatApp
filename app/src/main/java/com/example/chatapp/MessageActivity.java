@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -39,12 +38,11 @@ import java.math.BigInteger;
 public class MessageActivity extends AppCompatActivity{
     private String receiver_name = null;
     private String receiver_uid = null;
-    private DatabaseReference senderDatabase;
+    private DatabaseReference senderMessageRef;
     private DatabaseReference mDatabase;
     private RecyclerView mMessageList;
     private FirebaseUser mUser;
     private FirebaseUser mCurrentUser;
-    private DatabaseReference mDatabaseUsers;
     private DatabaseReference mReceiverRef;
     public FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -80,10 +78,10 @@ public class MessageActivity extends AppCompatActivity{
 
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        senderDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
-        mDatabase = senderDatabase.child("Messages");
+        senderMessageRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(mUser.getUid());
+        mDatabase = senderMessageRef.child("Messages");
 
-        senderDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+        senderMessageRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 myPublicKey[0] = new BigInteger(dataSnapshot.child("mod").getValue().toString());
@@ -211,7 +209,6 @@ public class MessageActivity extends AppCompatActivity{
 
     public void sendButtonClicked(View view) {
         mCurrentUser = mAuth.getCurrentUser();
-        mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
         FirebaseApp.initializeApp(this);
         final String messageValue = editMessage.getText().toString().trim();
         if(!TextUtils.isEmpty(messageValue)){

@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -167,9 +166,9 @@ public class MainActivity extends AppCompatActivity{
                 prefEditor.commit();
             }
         }
-//        if (id == R.id.privateKeyRemove){
-//            prefEditor.putString("privateKey", "1");
-//        }
+        if (id == R.id.privateKeyRemove){
+            prefEditor.putString("privateKey", "1");
+        }
         return super.onOptionsItemSelected(item);
     }
 }
