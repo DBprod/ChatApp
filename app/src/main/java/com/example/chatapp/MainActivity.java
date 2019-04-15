@@ -167,9 +167,9 @@ public class MainActivity extends AppCompatActivity{
                 prefEditor.commit();
             }
         }
-        if (id == R.id.privateKeyRemove){
-            prefEditor.putString("privateKey", "1");
-        }
+//        if (id == R.id.privateKeyRemove){
+//            prefEditor.putString("privateKey", "1");
+//        }
         return super.onOptionsItemSelected(item);
     }
 }
