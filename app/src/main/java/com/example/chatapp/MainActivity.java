@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         FirebaseApp.initializeApp(this);
 
-        preferences = getSharedPreferences("privateKeyPreference", Context.MODE_PRIVATE);
+        preferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
         prefEditor = preferences.edit();
 
         mContactList = (RecyclerView) findViewById(R.id.contactRec);

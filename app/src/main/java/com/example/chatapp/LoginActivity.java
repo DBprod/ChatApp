@@ -1,6 +1,8 @@
 package com.example.chatapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText loginPass;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor prefEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,9 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
+
+        preferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        prefEditor = preferences.edit();
     }
     public void loginButtonClicked(View view) {
         String email = loginEmail.getText().toString().trim();
@@ -63,6 +70,19 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(user_id)) {
+                    mDatabase.child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            prefEditor.putString("mod", dataSnapshot.child("mod").getValue().toString()).commit();
+                            prefEditor.putString("exp", dataSnapshot.child("exp").getValue().toString()).commit();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
                     Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); // prevents user from going back to previous activity
                     startActivity(loginIntent);

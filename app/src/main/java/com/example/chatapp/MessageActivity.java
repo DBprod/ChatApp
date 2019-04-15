@@ -60,7 +60,7 @@ public class MessageActivity extends AppCompatActivity{
         setContentView(R.layout.activity_message);
         FirebaseApp.initializeApp(this);
 
-        preferences = getSharedPreferences("privateKeyPreference", Context.MODE_PRIVATE);
+        preferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
         prefEditor = preferences.edit();
 
         editMessage = (EditText) findViewById(R.id.editMessage);
@@ -81,18 +81,10 @@ public class MessageActivity extends AppCompatActivity{
         senderMessageRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(mUser.getUid());
         mDatabase = senderMessageRef.child("Messages");
 
-        senderMessageRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                myPublicKey[0] = new BigInteger(dataSnapshot.child("mod").getValue().toString());
-                myPublicKey[1] = new BigInteger(dataSnapshot.child("exp").getValue().toString());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        myPublicKey[0] = new BigInteger(preferences.getString("mod", "0"));
+        myPublicKey[1] = new BigInteger(preferences.getString("exp", "0"));
+        if(myPublicKey[0].equals("0") || myPublicKey[1].equals("0"))
+            System.out.print("Failed to get Public Key. MessageActivity.java line 87");
 
         receiverPublicKey[0] = new BigInteger(getIntent().getExtras().getString("receiverMod"));
         receiverPublicKey[1] = new BigInteger(getIntent().getExtras().getString("receiverExp"));
