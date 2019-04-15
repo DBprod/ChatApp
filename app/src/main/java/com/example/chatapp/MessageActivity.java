@@ -159,7 +159,7 @@ public class MessageActivity extends AppCompatActivity{
         mMessageList.setAdapter(adapter);
         adapter.startListening();
 
-        mDatabase.addChildEventListener(new ChildEventListener() {
+        mDatabase.child(receiver_uid).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 mMessageList.smoothScrollToPosition(mMessageList.getAdapter().getItemCount());
