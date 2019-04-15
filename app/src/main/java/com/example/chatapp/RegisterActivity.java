@@ -69,6 +69,7 @@ public class RegisterActivity extends AppCompatActivity {
                         DatabaseReference current_user_db = mDatabase.child(user_id);
                         current_user_db.child("name").setValue(name_content);
                         current_user_db.child("uid").setValue(mAuth.getUid());
+                        current_user_db.child("email").setValue(email_content);
 
                         BigInteger[] primes = Encryptor.generatePrimes();
                         BigInteger[] publicKey = Encryptor.generatePublicKey(primes[0], primes[1]);

@@ -68,7 +68,7 @@ public class MessageActivity extends AppCompatActivity{
         receiver_name = getIntent().getExtras().getString("receiverName");
         receiver_uid = getIntent().getExtras().getString("uid");
 
-        mReceiverRef = FirebaseDatabase.getInstance().getReference().child("Users").child(receiver_uid).child("Messages");
+        mReceiverRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(receiver_uid).child("Messages");
 
         mMessageList = (RecyclerView) findViewById(R.id.messageRec);
         mMessageList.setHasFixedSize(true);
