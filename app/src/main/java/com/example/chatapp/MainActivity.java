@@ -1,6 +1,5 @@
 package com.example.chatapp;
 
-import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -23,15 +22,19 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.math.BigInteger;
 
 public class MainActivity extends AppCompatActivity{
 
-    private DatabaseReference mDatabase;
+    private DatabaseReference currentUserRef;
+    private DatabaseReference receiverUserDB;
     private RecyclerView mContactList;
     public FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -63,7 +66,6 @@ public class MainActivity extends AppCompatActivity{
        // linearLayoutManager.setStackFromEnd(true); // makes message list start displaying from the bottom of screen
         mContactList.setLayoutManager(linearLayoutManager);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -78,6 +80,8 @@ public class MainActivity extends AppCompatActivity{
             }
         };
 
+        currentUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid()).child("Contacts");
+
         getSupportActionBar().setTitle("Your Messages");
     }
 
@@ -85,26 +89,38 @@ public class MainActivity extends AppCompatActivity{
     protected void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
-        Query query = mDatabase;
+        Query query = currentUserRef;
         FirebaseRecyclerOptions<People> options = new FirebaseRecyclerOptions.Builder<People>().setQuery(query, People.class).build();
         adapter = new FirebaseRecyclerAdapter<People, PeopleHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull PeopleHolder holder, int position, @NonNull People model) {
-                holder.setUsername(model.getName());
-                final String uid = model.getUid();
-                final String receiverExp = model.getExp();
-                final String receiverMod = model.getMod();
-
-                final String receiverName = model.getName();
-                holder.mView.setOnClickListener(new View.OnClickListener() {
+            protected void onBindViewHolder(@NonNull final PeopleHolder holder, int position, @NonNull People model) {
+                final String uid = model.getContactId();
+                DatabaseReference receiverUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
+                holder.setContent(Encryptor.decrypt(model.getContent(), myPublicKey, new BigInteger(Encryptor.privateKey)));
+                receiverUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onClick(View v) {
-                        Intent viewMessagesIntent = new Intent(MainActivity.this, MessageActivity.class);
-                        viewMessagesIntent.putExtra("uid", uid);
-                        viewMessagesIntent.putExtra("receiverName", receiverName);
-                        viewMessagesIntent.putExtra("receiverMod", receiverMod);
-                        viewMessagesIntent.putExtra("receiverExp", receiverExp);
-                        startActivity(viewMessagesIntent);
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        final String receiverName = dataSnapshot.child("name").getValue().toString();
+                        final String receiverMod = dataSnapshot.child("mod").getValue().toString();
+                        final String receiverExp = dataSnapshot.child("exp").getValue().toString();
+
+                        holder.setUsername(receiverName);
+                        holder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent viewMessagesIntent = new Intent(MainActivity.this, MessageActivity.class);
+                                viewMessagesIntent.putExtra("uid", uid);
+                                viewMessagesIntent.putExtra("receiverName", receiverName);
+                                viewMessagesIntent.putExtra("receiverMod", receiverMod);
+                                viewMessagesIntent.putExtra("receiverExp", receiverExp);
+                                startActivity(viewMessagesIntent);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });
             }
@@ -135,7 +151,6 @@ public class MainActivity extends AppCompatActivity{
         // note this class is usually static but had to gain access to an
         View mView;
 
-
         public PeopleHolder(@NonNull View itemView) {
             super(itemView);
             mView = itemView;
@@ -143,8 +158,13 @@ public class MainActivity extends AppCompatActivity{
 
 
         public void setUsername(String username){
-            TextView name_content = (TextView) mView.findViewById(R.id.nameField);
-            name_content.setText(username);
+            TextView nameView = mView.findViewById(R.id.nameField);
+            nameView.setText(username);
+        }
+
+        public void setContent(String content){
+            TextView contentView = mView.findViewById(R.id.recentMessage);
+            contentView.setText(content);
         }
     }
 
@@ -178,6 +198,7 @@ public class MainActivity extends AppCompatActivity{
                     if (Encryptor.checkKeys(myPublicKey)) {
                         menu.findItem(R.id.privateKeyInput).setTitle("Remove Private Key");
                         correctKeyInput = true;
+                        adapter.notifyDataSetChanged();
                     } else {
                         menu.findItem(R.id.privateKeyInput).setTitle("Set Private Key");
                         Toast.makeText(this, "Incorrect Private Key", Toast.LENGTH_SHORT).show();
@@ -191,6 +212,7 @@ public class MainActivity extends AppCompatActivity{
                 Encryptor.privateKey = "1";
                 correctKeyInput = false;
                 setMenuKeyText(false);
+                adapter.notifyDataSetChanged();
             }
             ClipData emptyClip = ClipData.newPlainText("", "");
             clipboard.setPrimaryClip(emptyClip);

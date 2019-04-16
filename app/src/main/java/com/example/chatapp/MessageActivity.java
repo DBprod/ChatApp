@@ -35,6 +35,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
 
 public class MessageActivity extends AppCompatActivity{
     private String receiver_name = null;
@@ -54,6 +55,7 @@ public class MessageActivity extends AppCompatActivity{
     private SharedPreferences.Editor prefEditor;
     private Menu menu;
     private boolean correctKeyInput;
+    private DatabaseReference UsersDatabase;
 
     private EditText editMessage;
 
@@ -83,6 +85,7 @@ public class MessageActivity extends AppCompatActivity{
 
         senderMessageRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(mUser.getUid());
         mDatabase = senderMessageRef.child("Messages");
+        UsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
         myPublicKey[0] = new BigInteger(preferences.getString("mod", "1"));
         myPublicKey[1] = new BigInteger(preferences.getString("exp", "1"));
@@ -214,22 +217,40 @@ public class MessageActivity extends AppCompatActivity{
             if(messageInt.compareTo(new BigInteger("0")) == -1)
                 emoji = true;
 
-            final String myEncryptedMessage = Encryptor.encrypt(messageInt, myPublicKey).toString();
+            final String senderEncryptedMessage = Encryptor.encrypt(messageInt, myPublicKey).toString();
             final String receiverEncryptedMessage = Encryptor.encrypt(messageInt, receiverPublicKey).toString();
 
-
             //send message to yourself
+            final long timestamp = System.currentTimeMillis();
             final DatabaseReference senderPost = mDatabase.child(receiver_uid).push();
-            senderPost.child("content").setValue(myEncryptedMessage);
-//            senderPost.child("chatId").setValue(receiver_uid);
+            final DatabaseReference senderRecentPost = UsersDatabase.child(mCurrentUser.getUid()).child("Contacts");
+            senderRecentPost.child(receiver_uid).removeValue(new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                    DatabaseReference recentRef = senderRecentPost.child(receiver_uid);
+                    recentRef.child("content").setValue(senderEncryptedMessage);
+                    recentRef.child("contactId").setValue(receiver_uid);
+                    recentRef.child("timestamp").setValue(timestamp);
+                }
+            });
+            senderPost.child("content").setValue(senderEncryptedMessage);
             senderPost.child("sender").setValue(1);
             senderPost.child("emoji").setValue(emoji);
             //send message to other
 
             if(!receiver_uid.equals(mCurrentUser.getUid())) {
                 final DatabaseReference receiverPost = mReceiverRef.child(mUser.getUid()).push();
+                final DatabaseReference receiverRecentPost = UsersDatabase.child(receiver_uid).child("Contacts");
+                senderRecentPost.child(mCurrentUser.getUid()).removeValue(new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        DatabaseReference recentRef = receiverRecentPost.child(mCurrentUser.getUid());
+                        recentRef.child("content").setValue(receiverEncryptedMessage);
+                        recentRef.child("contactId").setValue(mCurrentUser.getUid());
+                        recentRef.child("timestamp").setValue(timestamp);
+                    }
+                });
                 receiverPost.child("content").setValue(receiverEncryptedMessage);
-//                receiverPost.child("chatId").setValue(mUser.getUid());
                 receiverPost.child("sender").setValue(0);
                 receiverPost.child("emoji").setValue(emoji);
             }
