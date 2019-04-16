@@ -36,13 +36,14 @@ public class MainActivity extends AppCompatActivity{
     public FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseRecyclerAdapter<People, PeopleHolder> adapter;
+    private Menu menu;
     private SharedPreferences preferences;
     private SharedPreferences.Editor prefEditor;
-    private Menu menu;
+    private BigInteger[] myPublicKey = new BigInteger[2];
+    private boolean menuCreated = false;
 
     private static final String TAG = "MESSAGE";
 
-    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +52,9 @@ public class MainActivity extends AppCompatActivity{
 
         preferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
         prefEditor = preferences.edit();
+
+        myPublicKey[0] = new BigInteger(preferences.getString("mod", "1"));
+        myPublicKey[1] = new BigInteger(preferences.getString("exp", "1"));
 
         mContactList = (RecyclerView) findViewById(R.id.contactRec);
         mContactList.setHasFixedSize(true);
@@ -113,6 +117,10 @@ public class MainActivity extends AppCompatActivity{
         };
         mContactList.setAdapter(adapter);
         adapter.startListening();
+
+        if(menuCreated){
+            setMenuKeyText(Encryptor.checkKeys(myPublicKey));
+        }
     }
 
     @Override
@@ -143,6 +151,8 @@ public class MainActivity extends AppCompatActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.mymenu, menu);
         this.menu = menu;
+        setMenuKeyText(Encryptor.checkKeys(myPublicKey));
+        menuCreated = true;
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -152,39 +162,40 @@ public class MainActivity extends AppCompatActivity{
         int id = item.getItemId();
 
         if (id == R.id.logoutBtn) {
-            mAuth.signOut();
             prefEditor.clear().commit();
+            mAuth.signOut();
         }
         if (id == R.id.privateKeyInput){
-<<<<<<< HEAD
-            MenuItem menuItem = menu.findItem(R.id.privateKeyInput);
-=======
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            ClipData clip = clipboard.getPrimaryClip();
->>>>>>> 77121e1bc51ffc1f144a471724fb11f13faf0fcc
-            try{
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clip = clipboard.getPrimaryClip();
                 String privateKey = clip.getItemAt(0).coerceToText(this).toString();
-                new BigInteger(privateKey);
-                prefEditor.putString("privateKey", privateKey);
-            }
-            catch(Exception e){
-                prefEditor.putString("privateKey", "1");
-            } finally {
-                prefEditor.commit();
-                ClipData emptyClip = ClipData.newPlainText("", "");
-                clipboard.setPrimaryClip(emptyClip);
-                Toast.makeText(this, "Your clipboard has been erased", Toast.LENGTH_SHORT).show();
-            }
-        }
-        if (id == R.id.privateKeyRemove){
-            prefEditor.putString("privateKey", "1");
+                try {
+                    new BigInteger(privateKey);
+                    Encryptor.privateKey = privateKey;
+                    if(Encryptor.checkKeys(myPublicKey)){
+                        menu.findItem(R.id.privateKeyInput).setTitle("Remove Private Key");
+                    } else{
+                        menu.findItem(R.id.privateKeyInput).setTitle("Set Private Key");
+                    }
 
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            ClipData emptyClip = ClipData.newPlainText("", "");
-            clipboard.setPrimaryClip(emptyClip);
+                } catch (Exception e) {
+                    Encryptor.privateKey = "1";
+                } finally {
+                    ClipData emptyClip = ClipData.newPlainText("", "");
+                    clipboard.setPrimaryClip(emptyClip);
+                    Toast.makeText(this, "Your clipboard has been erased", Toast.LENGTH_SHORT).show();
+                }
 
-            Toast.makeText(this, "Your clipboard has been erased", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setMenuKeyText(boolean validKey){
+        MenuItem menuItem = menu.findItem(R.id.privateKeyInput);
+        if(validKey){
+            menuItem.setTitle("Remove Private Key");
+        } else{
+            menuItem.setTitle("Set Private Key");
+        }
     }
 }

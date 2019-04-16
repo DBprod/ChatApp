@@ -6,11 +6,6 @@
         android:id="@+id/privateKeyInput"
         />
     <item
-        android:title="Remove Private Key"
-        android:id="@+id/privateKeyRemove"
-        />
-
-    <item
         android:id="@+id/logoutBtn"
         android:title="Log Out"
         />
