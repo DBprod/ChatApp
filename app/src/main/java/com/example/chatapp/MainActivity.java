@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -155,10 +156,13 @@ public class MainActivity extends AppCompatActivity{
             prefEditor.clear().commit();
         }
         if (id == R.id.privateKeyInput){
+<<<<<<< HEAD
             MenuItem menuItem = menu.findItem(R.id.privateKeyInput);
+=======
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            ClipData clip = clipboard.getPrimaryClip();
+>>>>>>> 77121e1bc51ffc1f144a471724fb11f13faf0fcc
             try{
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                ClipData clip = clipboard.getPrimaryClip();
                 String privateKey = clip.getItemAt(0).coerceToText(this).toString();
                 new BigInteger(privateKey);
                 prefEditor.putString("privateKey", privateKey);
@@ -167,10 +171,19 @@ public class MainActivity extends AppCompatActivity{
                 prefEditor.putString("privateKey", "1");
             } finally {
                 prefEditor.commit();
+                ClipData emptyClip = ClipData.newPlainText("", "");
+                clipboard.setPrimaryClip(emptyClip);
+                Toast.makeText(this, "Your clipboard has been erased", Toast.LENGTH_SHORT).show();
             }
         }
         if (id == R.id.privateKeyRemove){
             prefEditor.putString("privateKey", "1");
+
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            ClipData emptyClip = ClipData.newPlainText("", "");
+            clipboard.setPrimaryClip(emptyClip);
+
+            Toast.makeText(this, "Your clipboard has been erased", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
