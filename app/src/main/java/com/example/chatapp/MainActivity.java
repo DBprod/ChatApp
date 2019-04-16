@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity{
     private SharedPreferences.Editor prefEditor;
     private BigInteger[] myPublicKey = new BigInteger[2];
     private boolean menuCreated = false;
+    private boolean correctKeyInput = false;
 
     private static final String TAG = "MESSAGE";
 
@@ -119,7 +120,8 @@ public class MainActivity extends AppCompatActivity{
         adapter.startListening();
 
         if(menuCreated){
-            setMenuKeyText(Encryptor.checkKeys(myPublicKey));
+            correctKeyInput = Encryptor.checkKeys(myPublicKey);
+            setMenuKeyText(correctKeyInput);
         }
     }
 
@@ -166,26 +168,32 @@ public class MainActivity extends AppCompatActivity{
             mAuth.signOut();
         }
         if (id == R.id.privateKeyInput){
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            if(!correctKeyInput) {
                 ClipData clip = clipboard.getPrimaryClip();
                 String privateKey = clip.getItemAt(0).coerceToText(this).toString();
                 try {
                     new BigInteger(privateKey);
                     Encryptor.privateKey = privateKey;
-                    if(Encryptor.checkKeys(myPublicKey)){
+                    if (Encryptor.checkKeys(myPublicKey)) {
                         menu.findItem(R.id.privateKeyInput).setTitle("Remove Private Key");
-                    } else{
+                        correctKeyInput = true;
+                    } else {
                         menu.findItem(R.id.privateKeyInput).setTitle("Set Private Key");
+                        Toast.makeText(this, "Incorrect Private Key", Toast.LENGTH_SHORT).show();
                     }
 
                 } catch (Exception e) {
                     Encryptor.privateKey = "1";
-                } finally {
-                    ClipData emptyClip = ClipData.newPlainText("", "");
-                    clipboard.setPrimaryClip(emptyClip);
-                    Toast.makeText(this, "Your clipboard has been erased", Toast.LENGTH_SHORT).show();
                 }
-
+            }
+            else{
+                Encryptor.privateKey = "1";
+                correctKeyInput = false;
+                setMenuKeyText(false);
+            }
+            ClipData emptyClip = ClipData.newPlainText("", "");
+            clipboard.setPrimaryClip(emptyClip);
         }
         return super.onOptionsItemSelected(item);
     }
