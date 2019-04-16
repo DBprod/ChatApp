@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class Encryptor {
+    public static String privateKey;
 
     public static BigInteger[] generatePublicKey(BigInteger p, BigInteger q){
         BigInteger[] keys = new BigInteger[2];

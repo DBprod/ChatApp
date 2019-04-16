@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity{
     private FirebaseRecyclerAdapter<People, PeopleHolder> adapter;
     private SharedPreferences preferences;
     private SharedPreferences.Editor prefEditor;
+    private Menu menu;
 
     private static final String TAG = "MESSAGE";
 
@@ -140,6 +141,7 @@ public class MainActivity extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.mymenu, menu);
+        this.menu = menu;
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -153,6 +155,7 @@ public class MainActivity extends AppCompatActivity{
             prefEditor.clear().commit();
         }
         if (id == R.id.privateKeyInput){
+            MenuItem menuItem = menu.findItem(R.id.privateKeyInput);
             try{
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                 ClipData clip = clipboard.getPrimaryClip();
