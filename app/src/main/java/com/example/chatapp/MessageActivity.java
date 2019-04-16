@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -250,9 +251,9 @@ public class MessageActivity extends AppCompatActivity{
             prefEditor.putString("privateKey", null).commit();
         }
         if (id == R.id.privateKeyInput){
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            ClipData clip = clipboard.getPrimaryClip();
             try{
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                ClipData clip = clipboard.getPrimaryClip();
                 String privateKey = clip.getItemAt(0).coerceToText(this).toString();
                 new BigInteger(privateKey);
                 prefEditor.putString("privateKey", privateKey);
@@ -262,11 +263,21 @@ public class MessageActivity extends AppCompatActivity{
             } finally {
                 prefEditor.commit();
                 adapter.notifyDataSetChanged();
+
+                ClipData emptyClip = ClipData.newPlainText("", "");
+                clipboard.setPrimaryClip(emptyClip);
+                Toast.makeText(this, "Your clipboard has been erased", Toast.LENGTH_SHORT).show();
             }
         }
         if (id == R.id.privateKeyRemove){
             prefEditor.putString("privateKey", "1").commit();
             adapter.notifyDataSetChanged();
+
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            ClipData emptyClip = ClipData.newPlainText("", "");
+            clipboard.setPrimaryClip(emptyClip);
+
+            Toast.makeText(this, "Your clipboard has been erased", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
