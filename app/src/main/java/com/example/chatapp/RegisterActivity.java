@@ -1,6 +1,8 @@
 package com.example.chatapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +25,8 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText name,email,password, confirmPassword;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor prefEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,9 @@ public class RegisterActivity extends AppCompatActivity {
         confirmPassword = findViewById(R.id.confirmPassword);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
+
+        preferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        prefEditor = preferences.edit();
     }
 
     public void signupButtonClicked(View view){
@@ -62,13 +69,18 @@ public class RegisterActivity extends AppCompatActivity {
                         DatabaseReference current_user_db = mDatabase.child(user_id);
                         current_user_db.child("name").setValue(name_content);
                         current_user_db.child("uid").setValue(mAuth.getUid());
+                        current_user_db.child("email").setValue(email_content);
 
                         BigInteger[] primes = Encryptor.generatePrimes();
                         BigInteger[] publicKey = Encryptor.generatePublicKey(primes[0], primes[1]);
 
                         // Public key logic and storing into database
-                        current_user_db.child("mod").setValue(publicKey[0].toString());
-                        current_user_db.child("exp").setValue(publicKey[1].toString());
+                        String mod = publicKey[0].toString();
+                        String exp = publicKey[1].toString();
+                        current_user_db.child("mod").setValue(mod);
+                        current_user_db.child("exp").setValue(exp);
+                        prefEditor.putString("mod", mod).commit();
+                        prefEditor.putString("exp", exp).commit();
 
                         //Generating private key to send to the private key activity
                         String privateKey = Encryptor.generatePrivateKey(publicKey, primes[0], primes[1]).toString();

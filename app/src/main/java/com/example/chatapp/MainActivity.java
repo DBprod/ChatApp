@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         FirebaseApp.initializeApp(this);
 
-        preferences = getSharedPreferences("privateKeyPreference", Context.MODE_PRIVATE);
+        preferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
         prefEditor = preferences.edit();
 
         mContactList = (RecyclerView) findViewById(R.id.contactRec);
@@ -154,10 +153,10 @@ public class MainActivity extends AppCompatActivity{
             prefEditor.clear().commit();
         }
         if (id == R.id.privateKeyInput){
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            ClipData clip = clipboard.getPrimaryClip();
-            String privateKey = clip.getItemAt(0).coerceToText(this).toString();
             try{
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clip = clipboard.getPrimaryClip();
+                String privateKey = clip.getItemAt(0).coerceToText(this).toString();
                 new BigInteger(privateKey);
                 prefEditor.putString("privateKey", privateKey);
             }

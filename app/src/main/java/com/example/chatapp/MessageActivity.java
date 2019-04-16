@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -39,12 +38,11 @@ import java.math.BigInteger;
 public class MessageActivity extends AppCompatActivity{
     private String receiver_name = null;
     private String receiver_uid = null;
-    private DatabaseReference senderDatabase;
+    private DatabaseReference senderMessageRef;
     private DatabaseReference mDatabase;
     private RecyclerView mMessageList;
     private FirebaseUser mUser;
     private FirebaseUser mCurrentUser;
-    private DatabaseReference mDatabaseUsers;
     private DatabaseReference mReceiverRef;
     public FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -62,7 +60,7 @@ public class MessageActivity extends AppCompatActivity{
         setContentView(R.layout.activity_message);
         FirebaseApp.initializeApp(this);
 
-        preferences = getSharedPreferences("privateKeyPreference", Context.MODE_PRIVATE);
+        preferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
         prefEditor = preferences.edit();
 
         editMessage = (EditText) findViewById(R.id.editMessage);
@@ -70,7 +68,7 @@ public class MessageActivity extends AppCompatActivity{
         receiver_name = getIntent().getExtras().getString("receiverName");
         receiver_uid = getIntent().getExtras().getString("uid");
 
-        mReceiverRef = FirebaseDatabase.getInstance().getReference().child("Users").child(receiver_uid).child("Messages");
+        mReceiverRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(receiver_uid).child("Messages");
 
         mMessageList = (RecyclerView) findViewById(R.id.messageRec);
         mMessageList.setHasFixedSize(true);
@@ -80,21 +78,13 @@ public class MessageActivity extends AppCompatActivity{
 
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        senderDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
-        mDatabase = senderDatabase.child("Messages");
+        senderMessageRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(mUser.getUid());
+        mDatabase = senderMessageRef.child("Messages");
 
-        senderDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                myPublicKey[0] = new BigInteger(dataSnapshot.child("mod").getValue().toString());
-                myPublicKey[1] = new BigInteger(dataSnapshot.child("exp").getValue().toString());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        myPublicKey[0] = new BigInteger(preferences.getString("mod", "0"));
+        myPublicKey[1] = new BigInteger(preferences.getString("exp", "0"));
+        if(myPublicKey[0].equals("0") || myPublicKey[1].equals("0"))
+            System.out.print("Failed to get Public Key. MessageActivity.java line 87");
 
         receiverPublicKey[0] = new BigInteger(getIntent().getExtras().getString("receiverMod"));
         receiverPublicKey[1] = new BigInteger(getIntent().getExtras().getString("receiverExp"));
@@ -125,7 +115,7 @@ public class MessageActivity extends AppCompatActivity{
             protected void onBindViewHolder(@NonNull MessageHolder holder, int position, @NonNull Message model) {
                 String cipherInt = model.getContent();
                 boolean emoji = model.isEmoji();
-                String plainText = Encryptor.decrypt(cipherInt, myPublicKey, new BigInteger(preferences.getString("privateKey", "0")), emoji);
+                String plainText = Encryptor.decrypt(cipherInt, myPublicKey, new BigInteger(preferences.getString("privateKey", "1")), emoji);
                 holder.setContent(plainText);
             }
 
@@ -159,7 +149,7 @@ public class MessageActivity extends AppCompatActivity{
         mMessageList.setAdapter(adapter);
         adapter.startListening();
 
-        mDatabase.addChildEventListener(new ChildEventListener() {
+        mDatabase.child(receiver_uid).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 mMessageList.smoothScrollToPosition(mMessageList.getAdapter().getItemCount());
@@ -211,7 +201,6 @@ public class MessageActivity extends AppCompatActivity{
 
     public void sendButtonClicked(View view) {
         mCurrentUser = mAuth.getCurrentUser();
-        mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
         FirebaseApp.initializeApp(this);
         final String messageValue = editMessage.getText().toString().trim();
         if(!TextUtils.isEmpty(messageValue)){
@@ -261,10 +250,10 @@ public class MessageActivity extends AppCompatActivity{
             prefEditor.putString("privateKey", null).commit();
         }
         if (id == R.id.privateKeyInput){
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            ClipData clip = clipboard.getPrimaryClip();
-            String privateKey = clip.getItemAt(0).coerceToText(this).toString();
             try{
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clip = clipboard.getPrimaryClip();
+                String privateKey = clip.getItemAt(0).coerceToText(this).toString();
                 new BigInteger(privateKey);
                 prefEditor.putString("privateKey", privateKey);
             }
