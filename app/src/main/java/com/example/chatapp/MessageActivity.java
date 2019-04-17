@@ -35,7 +35,7 @@ import com.google.firebase.database.Query;
 
 import java.math.BigInteger;
 
-public class MessageActivity extends AppCompatActivity{
+public class MessageActivity extends AppCompatActivity implements LogoutDialog.LogoutDialogListener {
     private String receiver_name = null;
     private String receiver_uid = null;
     private DatabaseReference senderMessageRef;
@@ -276,8 +276,7 @@ public class MessageActivity extends AppCompatActivity{
         int id = item.getItemId();
 
         if (id == R.id.logoutBtn) {
-            prefEditor.clear().commit();
-            mAuth.signOut();
+            openDialog();
         }
         if (id == R.id.privateKeyInput) {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
@@ -319,6 +318,19 @@ public class MessageActivity extends AppCompatActivity{
             menuItem.setIcon(R.drawable.ic_lock_open);
         } else{
             menuItem.setIcon(R.drawable.ic_lock_closed);
+        }
+    }
+
+    public void openDialog() {
+        LogoutDialog logoutDialog = new LogoutDialog();
+        logoutDialog.show(getSupportFragmentManager(), "logout dialog");
+    }
+
+    @Override
+    public void logout(boolean logout) {
+        if(logout){
+            mAuth.signOut();
+            prefEditor.clear().commit();
         }
     }
 }

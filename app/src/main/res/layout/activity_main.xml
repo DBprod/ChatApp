@@ -10,33 +10,18 @@
     <android.support.v7.widget.SearchView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/searchUsersBar"
+        android:id="@+id/searchButton"
         android:layoutDirection="rtl"
         app:defaultQueryHint="Enter your friend's ID"
         app:searchIcon="@drawable/ic_person_add"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        app:iconifiedByDefault="false"
         />
-
-    <TextView
-        android:id="@+id/appDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/searchUsersBar"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="30dp"
-        android:text="I think that we should put a copy button here for the users to send their contact info to someone else"
-        android:textAlignment="center"/>
-
-
-
     <android.support.v7.widget.RecyclerView
-        android:layout_below="@+id/appDescription"
+        android:layout_below="@+id/searchButton"
         android:id="@+id/contactRec"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="0dp">
-
     </android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>
