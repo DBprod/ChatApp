@@ -149,7 +149,8 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
 
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
-                public boolean onQueryTextSubmit(final String s) {
+                public boolean onQueryTextSubmit(String s) {
+                    final String receiverId = s.trim();
                     DatabaseReference receiverUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(s);
                     receiverUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -159,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
                                 final String receiverMod = dataSnapshot.child("mod").getValue().toString();
                                 final String receiverExp = dataSnapshot.child("exp").getValue().toString();
                                 Intent viewMessagesIntent = new Intent(MainActivity.this, MessageActivity.class);
-                                viewMessagesIntent.putExtra("uid", s);
+                                viewMessagesIntent.putExtra("uid", receiverId);
                                 viewMessagesIntent.putExtra("receiverName", receiverName);
                                 viewMessagesIntent.putExtra("receiverMod", receiverMod);
                                 viewMessagesIntent.putExtra("receiverExp", receiverExp);
@@ -286,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
         if(logout){
             mAuth.signOut();
             prefEditor.clear().commit();
+            Encryptor.privateKey = "1";
         }
     }
 }

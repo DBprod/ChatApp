@@ -331,6 +331,7 @@ public class MessageActivity extends AppCompatActivity implements LogoutDialog.L
         if(logout){
             mAuth.signOut();
             prefEditor.clear().commit();
+            Encryptor.privateKey = "1";
         }
     }
 }
