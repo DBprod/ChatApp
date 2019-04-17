@@ -4,13 +4,15 @@ public class People {
     private String contactId;
     private long timestamp;
     private String content;
+    private int sender;
 
     public People(){}
 
-    public People(String contactId, long timestamp, String content) {
+    public People(String contactId, long timestamp, String content, int sender) {
         this.contactId = contactId;
         this.timestamp = timestamp;
         this.content = content;
+        this.sender = sender;
     }
 
     public String getContactId() {
@@ -35,5 +37,13 @@ public class People {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public int getSender() {
+        return sender;
+    }
+
+    public void setSender(int sender) {
+        this.sender = sender;
     }
 }

@@ -32,10 +32,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.math.BigInteger;
-import java.sql.Timestamp;
 
 public class MessageActivity extends AppCompatActivity{
     private String receiver_name = null;
@@ -231,6 +229,7 @@ public class MessageActivity extends AppCompatActivity{
                     recentRef.child("content").setValue(senderEncryptedMessage);
                     recentRef.child("contactId").setValue(receiver_uid);
                     recentRef.child("timestamp").setValue(timestamp);
+                    recentRef.child("sender").setValue(1);
                 }
             });
             senderPost.child("content").setValue(senderEncryptedMessage);
@@ -248,6 +247,7 @@ public class MessageActivity extends AppCompatActivity{
                         recentRef.child("content").setValue(receiverEncryptedMessage);
                         recentRef.child("contactId").setValue(mCurrentUser.getUid());
                         recentRef.child("timestamp").setValue(timestamp);
+                        recentRef.child("sender").setValue(0);
                     }
                 });
                 receiverPost.child("content").setValue(receiverEncryptedMessage);
@@ -262,9 +262,9 @@ public class MessageActivity extends AppCompatActivity{
     // create an action bar button
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.mymenu, menu);
+        getMenuInflater().inflate(R.menu.message_menu, menu);
         this.menu = menu;
-        setMenuKeyText(Encryptor.checkKeys(myPublicKey));
+        setMenuKeyIcon(Encryptor.checkKeys(myPublicKey));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -286,36 +286,37 @@ public class MessageActivity extends AppCompatActivity{
                     new BigInteger(privateKey);
                     Encryptor.privateKey = privateKey;
                     if (Encryptor.checkKeys(myPublicKey)) {
-                        setMenuKeyText(true);
+                        setMenuKeyIcon(true);
+                        ClipData emptyClip = ClipData.newPlainText("", "");
+                        clipboard.setPrimaryClip(emptyClip);
                         correctKeyInput = true;
+                        Toast.makeText(this, "Messages Successful Encrypted", Toast.LENGTH_SHORT).show();
                     } else {
-                        menu.findItem(R.id.privateKeyInput).setTitle("Set Private Key");
                         Toast.makeText(this, "Incorrect Private Key", Toast.LENGTH_SHORT).show();
                     }
 
                 } catch (Exception e) {
                     Encryptor.privateKey = "1";
-                    menu.findItem(R.id.privateKeyInput).setTitle("Set Private Key");
+                    Toast.makeText(this, "Incorrect Private Key", Toast.LENGTH_SHORT).show();
                 }
 
             } else{
+                Toast.makeText(this, "Messages Successful Encrypted", Toast.LENGTH_SHORT).show();
                 correctKeyInput = false;
                 Encryptor.privateKey = "1";
-                setMenuKeyText(false);
             }
-            ClipData emptyClip = ClipData.newPlainText("", "");
-            clipboard.setPrimaryClip(emptyClip);
             adapter.notifyDataSetChanged();
+            setMenuKeyIcon(correctKeyInput);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void setMenuKeyText(boolean validKey){
+    public void setMenuKeyIcon(boolean validKey){
         MenuItem menuItem = menu.findItem(R.id.privateKeyInput);
         if(validKey){
-            menuItem.setTitle("Remove Private Key");
+            menuItem.setIcon(R.drawable.ic_lock_open);
         } else{
-            menuItem.setTitle("Set Private Key");
+            menuItem.setIcon(R.drawable.ic_lock_closed);
         }
     }
 }

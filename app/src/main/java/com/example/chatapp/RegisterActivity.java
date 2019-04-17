@@ -15,6 +15,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -69,7 +72,6 @@ public class RegisterActivity extends AppCompatActivity {
                         DatabaseReference current_user_db = mDatabase.child(user_id);
                         current_user_db.child("name").setValue(name_content);
                         current_user_db.child("uid").setValue(mAuth.getUid());
-                        current_user_db.child("email").setValue(email_content);
 
                         BigInteger[] primes = Encryptor.generatePrimes();
                         BigInteger[] publicKey = Encryptor.generatePublicKey(primes[0], primes[1]);
@@ -88,6 +90,18 @@ public class RegisterActivity extends AppCompatActivity {
                         Intent privateKeyIntent = new Intent(RegisterActivity.this, PrivateKeyActivity.class);
                         privateKeyIntent.putExtra("privateKey", privateKey);
                         startActivity(privateKeyIntent);
+                    } else {
+                        try{
+                            throw task.getException();
+                        } catch (FirebaseAuthUserCollisionException userCollision){
+                            Toast.makeText(RegisterActivity.this, "The email is already in use", Toast.LENGTH_LONG).show();
+                        } catch (FirebaseAuthWeakPasswordException weakPassword){
+                            Toast.makeText(RegisterActivity.this, weakPassword.getReason(), Toast.LENGTH_LONG).show();
+                        } catch (FirebaseAuthInvalidCredentialsException invalidCredentials){
+                            Toast.makeText(RegisterActivity.this, "Invalid email", Toast.LENGTH_LONG).show();
+                        }  catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
