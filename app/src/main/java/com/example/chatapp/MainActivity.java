@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
     private BigInteger[] myPublicKey = new BigInteger[2];
     private boolean menuCreated = false;
     private boolean correctKeyInput = false;
+    android.support.v7.widget.SearchView searchView;
 
     private static final String TAG = "MESSAGE";
 
@@ -143,6 +144,44 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
                 correctKeyInput = Encryptor.checkKeys(myPublicKey);
                 setMenuKeyIcon(correctKeyInput);
             }
+
+            android.support.v7.widget.SearchView searchView = findViewById(R.id.searchButton);
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(final String s) {
+                    DatabaseReference receiverUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(s);
+                    receiverUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.hasChild("name")) {
+                                final String receiverName = dataSnapshot.child("name").getValue().toString();
+                                final String receiverMod = dataSnapshot.child("mod").getValue().toString();
+                                final String receiverExp = dataSnapshot.child("exp").getValue().toString();
+                                Intent viewMessagesIntent = new Intent(MainActivity.this, MessageActivity.class);
+                                viewMessagesIntent.putExtra("uid", s);
+                                viewMessagesIntent.putExtra("receiverName", receiverName);
+                                viewMessagesIntent.putExtra("receiverMod", receiverMod);
+                                viewMessagesIntent.putExtra("receiverExp", receiverExp);
+                                startActivity(viewMessagesIntent);
+                            } else {
+                                Toast.makeText(MainActivity.this, "This user does not exist", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    return false;
+                }
+            });
         }
     }
 
@@ -182,45 +221,6 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
         this.menu = menu;
         setMenuKeyIcon(Encryptor.checkKeys(myPublicKey));
         menuCreated = true;
-
-        MenuItem searchItem = menu.findItem(R.id.search_button);
-        android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) searchItem.getActionView();
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(final String s) {
-                DatabaseReference receiverUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(s);
-                receiverUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.hasChild("name")) {
-                            final String receiverName = dataSnapshot.child("name").getValue().toString();
-                            final String receiverMod = dataSnapshot.child("mod").getValue().toString();
-                            final String receiverExp = dataSnapshot.child("exp").getValue().toString();
-                            Intent viewMessagesIntent = new Intent(MainActivity.this, MessageActivity.class);
-                            viewMessagesIntent.putExtra("uid", s);
-                            viewMessagesIntent.putExtra("receiverName", receiverName);
-                            viewMessagesIntent.putExtra("receiverMod", receiverMod);
-                            viewMessagesIntent.putExtra("receiverExp", receiverExp);
-                            startActivity(viewMessagesIntent);
-                        } else {
-                            Toast.makeText(MainActivity.this, "This user does not exist", Toast.LENGTH_LONG).show();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-        });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -230,9 +230,7 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
         int id = item.getItemId();
 
         if (id == R.id.logoutBtn) {
-            prefEditor.clear().commit();
             openDialog();
-//            mAuth.signOut();
         }
         if (id == R.id.privateKeyInput){
             ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
@@ -287,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
     public void logout(boolean logout) {
         if(logout){
             mAuth.signOut();
+            prefEditor.clear().commit();
         }
     }
 }
