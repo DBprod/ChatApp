@@ -12,7 +12,7 @@
         android:fullBackupContent="@xml/backup_descriptor">
         <activity android:name=".PrivateKeyActivity">
         </activity>
-        <activity android:name=".MessageActivity">
+        <activity android:name=".MessageActivity" android:parentActivityName=".MainActivity">
         </activity>
         <activity android:name=".LoginActivity">
         </activity>

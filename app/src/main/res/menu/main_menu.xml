@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/search_button"
+        android:icon="@drawable/ic_search"
+        android:title="Search"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
+    <item
+        android:title="Input Private Key"
+        android:id="@+id/privateKeyInput"
+        app:showAsAction="ifRoom|collapseActionView"
+        android:icon="@drawable/ic_lock_closed"
+        />
+    <item
+        android:id="@+id/logoutBtn"
+        android:icon="@drawable/ic_exit_to_app"
+        app:showAsAction="ifRoom|collapseActionView"
+        android:title="Log Out"
+        />
+</menu>
