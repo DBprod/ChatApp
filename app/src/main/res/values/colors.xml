@@ -3,4 +3,6 @@
     <color name="colorPrimary">#6F9AFC</color>
     <color name="colorPrimaryDark">#6F9AFC</color>
     <color name="colorAccent">#03A9F4</color>
+    <color name="private_key_activity_background_color">#E3E9F8</color>
+
 </resources>
