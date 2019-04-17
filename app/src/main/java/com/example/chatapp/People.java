@@ -1,49 +1,49 @@
 package com.example.chatapp;
 
 public class People {
-    private String name;
-    private String uid;
-    private String mod;
-    private String exp;
+    private String contactId;
+    private long timestamp;
+    private String content;
+    private int sender;
 
     public People(){}
 
-    public People (String name, String uid, String mod, String exp){
-        this.name = name;
-        this.uid = uid;
-        this.mod = mod;
-        this.exp = exp;
+    public People(String contactId, long timestamp, String content, int sender) {
+        this.contactId = contactId;
+        this.timestamp = timestamp;
+        this.content = content;
+        this.sender = sender;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getContactId() {
+        return contactId;
     }
 
-    public String getName() {
-        return name;
+    public void setContactId(String contactId) {
+        this.contactId = contactId;
     }
 
-    public String getMod(){
-        return mod;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setMod(String publicKey) {
-        this.mod = publicKey;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public String getExp() {
-        return exp;
+    public String getContent() {
+        return content;
     }
 
-    public void setExp(String exp) {
-        this.exp = exp;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public String getUid() {
-        return uid;
+    public int getSender() {
+        return sender;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setSender(int sender) {
+        this.sender = sender;
     }
 }

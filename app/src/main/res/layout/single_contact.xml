@@ -1,25 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="80dp"
+    android:layout_margin="0dp"
+    android:orientation="horizontal">
 
-    android:layout_margin="10dp"
-    >
+    <LinearLayout
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="8dp"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/nameField"
-        android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/avatar_icon" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="340dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="5dp"
-        android:background="@drawable/contact_list_item"
-        android:fontFamily="sans-serif-light"
-        android:text="Hello"
+        android:layout_gravity="center"
+        android:layout_marginRight="8dp"
+        android:orientation="vertical">
 
-        android:textSize="30dp"/>
+        <TextView
+            android:id="@+id/nameField"
+            android:layout_width="351dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:fontFamily="sans-serif-light"
+            android:text="Hello"
+
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/recentMessage"
+            android:layout_width="match_parent"
+            android:layout_height="15sp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:text="TextView"
+            android:textSize="12sp" />
+    </LinearLayout>
 
 
 </LinearLayout>

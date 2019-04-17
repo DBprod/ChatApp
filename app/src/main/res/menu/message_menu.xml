@@ -4,14 +4,13 @@
     <item
         android:title="Input Private Key"
         android:id="@+id/privateKeyInput"
+        app:showAsAction="ifRoom|collapseActionView"
+        android:icon="@drawable/ic_lock_closed"
         />
-    <item
-        android:title="Remove Private Key"
-        android:id="@+id/privateKeyRemove"
-        />
-
     <item
         android:id="@+id/logoutBtn"
+        android:icon="@drawable/ic_exit_to_app"
+        app:showAsAction="ifRoom|collapseActionView"
         android:title="Log Out"
         />
 </menu>

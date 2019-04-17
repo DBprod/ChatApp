@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class Encryptor {
+    public static String privateKey = "1";
 
     public static BigInteger[] generatePublicKey(BigInteger p, BigInteger q){
         BigInteger[] keys = new BigInteger[2];
@@ -59,6 +60,12 @@ public class Encryptor {
             decipherInt = decipherInt.subtract(publicKey[0]);
         }
         return new String(decipherInt.toByteArray());
+    }
+
+    public static boolean checkKeys(BigInteger[] publicKey){
+        String testString = "5";
+        String resultString = Encryptor.decrypt(Encryptor.encrypt(testString, publicKey), publicKey, new BigInteger(Encryptor.privateKey));
+        return testString.equals(resultString);
     }
 
     private static BigInteger gcd(BigInteger a,BigInteger b){

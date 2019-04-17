@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -47,9 +48,12 @@ public class MessageActivity extends AppCompatActivity{
     private FirebaseAuth.AuthStateListener mAuthListener;
     private BigInteger[] myPublicKey = new BigInteger[2];
     private BigInteger[] receiverPublicKey =  new BigInteger[2];
-    FirebaseRecyclerAdapter<Message, MessageHolder> adapter;
+    private FirebaseRecyclerAdapter<Message, MessageHolder> adapter;
     private SharedPreferences preferences;
     private SharedPreferences.Editor prefEditor;
+    private Menu menu;
+    private boolean correctKeyInput;
+    private DatabaseReference UsersDatabase;
 
     private EditText editMessage;
 
@@ -79,9 +83,10 @@ public class MessageActivity extends AppCompatActivity{
 
         senderMessageRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(mUser.getUid());
         mDatabase = senderMessageRef.child("Messages");
+        UsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
-        myPublicKey[0] = new BigInteger(preferences.getString("mod", "0"));
-        myPublicKey[1] = new BigInteger(preferences.getString("exp", "0"));
+        myPublicKey[0] = new BigInteger(preferences.getString("mod", "1"));
+        myPublicKey[1] = new BigInteger(preferences.getString("exp", "1"));
         if(myPublicKey[0].equals("0") || myPublicKey[1].equals("0"))
             System.out.print("Failed to get Public Key. MessageActivity.java line 87");
 
@@ -114,7 +119,7 @@ public class MessageActivity extends AppCompatActivity{
             protected void onBindViewHolder(@NonNull MessageHolder holder, int position, @NonNull Message model) {
                 String cipherInt = model.getContent();
                 boolean emoji = model.isEmoji();
-                String plainText = Encryptor.decrypt(cipherInt, myPublicKey, new BigInteger(preferences.getString("privateKey", "1")), emoji);
+                String plainText = Encryptor.decrypt(cipherInt, myPublicKey, new BigInteger(Encryptor.privateKey), emoji);
                 holder.setContent(plainText);
             }
 
@@ -174,6 +179,8 @@ public class MessageActivity extends AppCompatActivity{
 
             }
         });
+
+        correctKeyInput = Encryptor.checkKeys(myPublicKey);
     }
 
     @Override
@@ -208,14 +215,24 @@ public class MessageActivity extends AppCompatActivity{
             if(messageInt.compareTo(new BigInteger("0")) == -1)
                 emoji = true;
 
-            final String myEncryptedMessage = Encryptor.encrypt(messageInt, myPublicKey).toString();
+            final String senderEncryptedMessage = Encryptor.encrypt(messageInt, myPublicKey).toString();
             final String receiverEncryptedMessage = Encryptor.encrypt(messageInt, receiverPublicKey).toString();
 
-
             //send message to yourself
+            final long timestamp = System.currentTimeMillis();
             final DatabaseReference senderPost = mDatabase.child(receiver_uid).push();
-            senderPost.child("content").setValue(myEncryptedMessage);
-//            senderPost.child("chatId").setValue(receiver_uid);
+            final DatabaseReference senderRecentPost = UsersDatabase.child(mCurrentUser.getUid()).child("Contacts");
+            senderRecentPost.child(receiver_uid).removeValue(new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                    DatabaseReference recentRef = senderRecentPost.child(receiver_uid);
+                    recentRef.child("content").setValue(senderEncryptedMessage);
+                    recentRef.child("contactId").setValue(receiver_uid);
+                    recentRef.child("timestamp").setValue(timestamp);
+                    recentRef.child("sender").setValue(1);
+                }
+            });
+            senderPost.child("content").setValue(senderEncryptedMessage);
             senderPost.child("sender").setValue(1);
             senderPost.child("emoji").setValue(emoji);
 
@@ -224,8 +241,18 @@ public class MessageActivity extends AppCompatActivity{
 
             if(!receiver_uid.equals(mCurrentUser.getUid())) {
                 final DatabaseReference receiverPost = mReceiverRef.child(mUser.getUid()).push();
+                final DatabaseReference receiverRecentPost = UsersDatabase.child(receiver_uid).child("Contacts");
+                senderRecentPost.child(mCurrentUser.getUid()).removeValue(new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        DatabaseReference recentRef = receiverRecentPost.child(mCurrentUser.getUid());
+                        recentRef.child("content").setValue(receiverEncryptedMessage);
+                        recentRef.child("contactId").setValue(mCurrentUser.getUid());
+                        recentRef.child("timestamp").setValue(timestamp);
+                        recentRef.child("sender").setValue(0);
+                    }
+                });
                 receiverPost.child("content").setValue(receiverEncryptedMessage);
-//                receiverPost.child("chatId").setValue(mUser.getUid());
                 receiverPost.child("sender").setValue(0);
                 receiverPost.child("emoji").setValue(emoji);
             }
@@ -237,7 +264,9 @@ public class MessageActivity extends AppCompatActivity{
     // create an action bar button
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.mymenu, menu);
+        getMenuInflater().inflate(R.menu.message_menu, menu);
+        this.menu = menu;
+        setMenuKeyIcon(Encryptor.checkKeys(myPublicKey));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -247,28 +276,49 @@ public class MessageActivity extends AppCompatActivity{
         int id = item.getItemId();
 
         if (id == R.id.logoutBtn) {
+            prefEditor.clear().commit();
             mAuth.signOut();
-            prefEditor.putString("privateKey", null).commit();
         }
-        if (id == R.id.privateKeyInput){
-            try{
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        if (id == R.id.privateKeyInput) {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            if (!correctKeyInput) {
                 ClipData clip = clipboard.getPrimaryClip();
                 String privateKey = clip.getItemAt(0).coerceToText(this).toString();
-                new BigInteger(privateKey);
-                prefEditor.putString("privateKey", privateKey);
+                try {
+                    new BigInteger(privateKey);
+                    Encryptor.privateKey = privateKey;
+                    if (Encryptor.checkKeys(myPublicKey)) {
+                        setMenuKeyIcon(true);
+                        ClipData emptyClip = ClipData.newPlainText("", "");
+                        clipboard.setPrimaryClip(emptyClip);
+                        correctKeyInput = true;
+                        Toast.makeText(this, "Messages Successful Encrypted", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Incorrect Private Key", Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Encryptor.privateKey = "1";
+                    Toast.makeText(this, "Incorrect Private Key", Toast.LENGTH_SHORT).show();
+                }
+
+            } else{
+                Toast.makeText(this, "Messages Successful Encrypted", Toast.LENGTH_SHORT).show();
+                correctKeyInput = false;
+                Encryptor.privateKey = "1";
             }
-            catch(Exception e){
-                prefEditor.putString("privateKey", "1");
-            } finally {
-                prefEditor.commit();
-                adapter.notifyDataSetChanged();
-            }
-        }
-        if (id == R.id.privateKeyRemove){
-            prefEditor.putString("privateKey", "1").commit();
             adapter.notifyDataSetChanged();
+            setMenuKeyIcon(correctKeyInput);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setMenuKeyIcon(boolean validKey){
+        MenuItem menuItem = menu.findItem(R.id.privateKeyInput);
+        if(validKey){
+            menuItem.setIcon(R.drawable.ic_lock_open);
+        } else{
+            menuItem.setIcon(R.drawable.ic_lock_closed);
+        }
     }
 }
