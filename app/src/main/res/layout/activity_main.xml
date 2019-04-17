@@ -32,7 +32,6 @@
 
     <android.support.v7.widget.RecyclerView
         android:layout_below="@+id/appDescription"
-        android:background="@drawable/contact_list_shape"
         android:id="@+id/contactRec"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
