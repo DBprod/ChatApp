@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="15dp"
         android:fontFamily="sans-serif-condensed-light"
         android:text="Encrypted Message App"
@@ -26,7 +26,7 @@
         android:layout_below="@+id/pageTitle"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="30dp"
-        android:text="Encrypt your message through RSA public key cryptography"
+        android:text="I think that we should put a copy button here for the users to send their contact info to someone else"
         android:textAlignment="center"/>
 
     <android.support.v7.widget.RecyclerView

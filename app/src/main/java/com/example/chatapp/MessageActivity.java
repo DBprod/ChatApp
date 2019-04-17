@@ -229,6 +229,7 @@ public class MessageActivity extends AppCompatActivity{
                     recentRef.child("content").setValue(senderEncryptedMessage);
                     recentRef.child("contactId").setValue(receiver_uid);
                     recentRef.child("timestamp").setValue(timestamp);
+                    recentRef.child("sender").setValue(1);
                 }
             });
             senderPost.child("content").setValue(senderEncryptedMessage);
@@ -246,6 +247,7 @@ public class MessageActivity extends AppCompatActivity{
                         recentRef.child("content").setValue(receiverEncryptedMessage);
                         recentRef.child("contactId").setValue(mCurrentUser.getUid());
                         recentRef.child("timestamp").setValue(timestamp);
+                        recentRef.child("sender").setValue(0);
                     }
                 });
                 receiverPost.child("content").setValue(receiverEncryptedMessage);

@@ -32,7 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.math.BigInteger;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements LogoutDialog.LogoutDialogListener {
 
     private DatabaseReference currentUserRef;
     private RecyclerView mContactList;
@@ -95,7 +95,11 @@ public class MainActivity extends AppCompatActivity{
                 @Override
                 protected void onBindViewHolder(@NonNull final PeopleHolder holder, int position, @NonNull People model) {
                     final String uid = model.getContactId();
-                    holder.setContent(Encryptor.decrypt(model.getContent(), myPublicKey, new BigInteger(Encryptor.privateKey)));
+                    String recentMessage = Encryptor.decrypt(model.getContent(), myPublicKey, new BigInteger(Encryptor.privateKey));
+                    if(model.getSender() == 1){
+                        recentMessage = "You: " + recentMessage;
+                    }
+                    holder.setContent(recentMessage);
                     DatabaseReference receiverUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
                     receiverUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -189,7 +193,7 @@ public class MainActivity extends AppCompatActivity{
                 receiverUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.child("name").getValue() != null) {
+                        if(dataSnapshot.hasChild("name")) {
                             final String receiverName = dataSnapshot.child("name").getValue().toString();
                             final String receiverMod = dataSnapshot.child("mod").getValue().toString();
                             final String receiverExp = dataSnapshot.child("exp").getValue().toString();
@@ -227,7 +231,8 @@ public class MainActivity extends AppCompatActivity{
 
         if (id == R.id.logoutBtn) {
             prefEditor.clear().commit();
-            mAuth.signOut();
+            openDialog();
+//            mAuth.signOut();
         }
         if (id == R.id.privateKeyInput){
             ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
@@ -271,6 +276,17 @@ public class MainActivity extends AppCompatActivity{
             menuItem.setIcon(R.drawable.ic_lock_open);
         } else{
             menuItem.setIcon(R.drawable.ic_lock_closed);
+        }
+    }
+    public void openDialog() {
+        LogoutDialog logoutDialog = new LogoutDialog();
+        logoutDialog.show(getSupportFragmentManager(), "logout dialog");
+    }
+
+    @Override
+    public void logout(boolean logout) {
+        if(logout){
+            mAuth.signOut();
         }
     }
 }

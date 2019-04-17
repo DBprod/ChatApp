@@ -75,20 +75,17 @@ public class LoginActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             prefEditor.putString("mod", dataSnapshot.child("mod").getValue().toString()).commit();
                             prefEditor.putString("exp", dataSnapshot.child("exp").getValue().toString()).commit();
+                            Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
+                            loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); // prevents user from going back to previous activity
+                            startActivity(loginIntent);
+                            finish();
                         }
-
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
 
                         }
                     });
-
-                    Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
-                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); // prevents user from going back to previous activity
-                    startActivity(loginIntent);
-                    finish();
                 }
-
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
