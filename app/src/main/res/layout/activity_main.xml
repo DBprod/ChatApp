@@ -11,8 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/searchButton"
-        android:layoutDirection="rtl"
-        app:defaultQueryHint="Enter your friend's ID"
+        app:defaultQueryHint="Enter a new friend's ID"
         app:searchIcon="@drawable/ic_person_add"
         app:iconifiedByDefault="false"
         />

@@ -6,6 +6,7 @@ import java.util.Random;
 
 public class Encryptor {
     public static String privateKey = "1";
+    public static boolean correctKey = false;
 
     public static BigInteger[] generatePublicKey(BigInteger p, BigInteger q){
         BigInteger[] keys = new BigInteger[2];
@@ -28,8 +29,6 @@ public class Encryptor {
         BigInteger p = new BigInteger(1024, 10000, new Random((long)(Math.random()*10000000)));
         BigInteger q = new BigInteger(1024, 10000, new Random((long)(Math.random()*10000000)));
         BigInteger[] primes = {p, q};
-        System.out.println("Prime 1: " + p);
-        System.out.println("Prime 2: " + q);
         return primes;
     }
 

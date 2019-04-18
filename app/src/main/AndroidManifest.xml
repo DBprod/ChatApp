@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.example.chatapp">
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
         android:allowBackup="true"
@@ -10,13 +11,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:fullBackupContent="@xml/backup_descriptor">
-        <activity android:name=".PrivateKeyActivity">
+        <activity android:name=".PrivateKeyActivity"
+            android:screenOrientation="portrait">
         </activity>
         <activity android:name=".MessageActivity" android:parentActivityName=".MainActivity">
         </activity>
-        <activity android:name=".LoginActivity">
+        <activity android:name=".LoginActivity"
+            android:screenOrientation="portrait">>
         </activity>
-        <activity android:name=".RegisterActivity">
+        <activity android:name=".RegisterActivity"
+            android:screenOrientation="portrait">>
         </activity>
         <activity android:name=".MainActivity">
             <intent-filter>

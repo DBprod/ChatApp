@@ -27,29 +27,29 @@
         android:layout_width="341dp"
         android:layout_height="68dp"
         android:layout_gravity="center"
-        android:layout_marginRight="15dp"
         android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/nameField"
             android:layout_width="351dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="0dp"
             android:fontFamily="sans-serif-light"
             android:text="Hello"
             android:textColor="#000000"
             android:textSize="18dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/recentMessage"
             android:layout_width="320dp"
-            android:layout_height="20dp"
-            android:layout_marginLeft="10dp"
+            android:layout_height="18sp"
+            android:layout_marginLeft="0dp"
             android:layout_marginTop="0dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="5dp"
