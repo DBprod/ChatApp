@@ -17,10 +17,10 @@
         <activity android:name=".MessageActivity" android:parentActivityName=".MainActivity">
         </activity>
         <activity android:name=".LoginActivity"
-            android:screenOrientation="portrait">>
+            android:screenOrientation="portrait">
         </activity>
         <activity android:name=".RegisterActivity"
-            android:screenOrientation="portrait">>
+            android:screenOrientation="portrait">
         </activity>
         <activity android:name=".MainActivity">
             <intent-filter>

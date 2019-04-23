@@ -289,33 +289,37 @@ public class MessageActivity extends AppCompatActivity implements LogoutDialog.L
 
         if (id == R.id.privateKeyInput) {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            ClipData clip = clipboard.getPrimaryClip();
-            String clipboardString = clip.getItemAt(0).coerceToText(this).toString().trim();
             if (!Encryptor.correctKey) {
+                ClipData clip = clipboard.getPrimaryClip();
                 try {
-                    new BigInteger(clipboardString);
-                    Encryptor.privateKey = clipboardString;
-                    if (Encryptor.checkKeys(myPublicKey)) {
-                        setMenuKeyIcon(true);
-                        ClipData emptyClip = ClipData.newPlainText("", "");
-                        clipboard.setPrimaryClip(emptyClip);
-                        Encryptor.correctKey = true;
-                        Toast.makeText(this, "Messages Successful Encrypted", Toast.LENGTH_SHORT).show();
-                        lockSound();
-                        adapter.notifyDataSetChanged();
-                    } else {
+                    String clipboardString = clip.getItemAt(0).coerceToText(this).toString().trim();
+                    try {
+                        new BigInteger(clipboardString);
+                        Encryptor.privateKey = clipboardString;
+                        if (Encryptor.checkKeys(myPublicKey)) {
+                            setMenuKeyIcon(true);
+                            ClipData emptyClip = ClipData.newPlainText("", "");
+                            clipboard.setPrimaryClip(emptyClip);
+                            Encryptor.correctKey = true;
+                            Toast.makeText(this, "Messages Successful Encrypted", Toast.LENGTH_SHORT).show();
+                            lockSound();
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            vibrate();
+                            Toast.makeText(this, "Clipboard private key is incorrect", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } catch (Exception e) {
                         vibrate();
-                        Toast.makeText(this, "Clipboard private key is incorrect", Toast.LENGTH_SHORT).show();
+                        if (clipboardString.isEmpty())
+                            Toast.makeText(this, "Clipboard is empty", Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(this, "Clipboard private key is incorrect", Toast.LENGTH_SHORT).show();
                     }
-
-                } catch (Exception e) {
+                } catch (Exception e){
                     vibrate();
-                    if(clipboardString.isEmpty())
-                        Toast.makeText(this, "Clipboard is empty", Toast.LENGTH_SHORT).show();
-                    else
-                        Toast.makeText(this, "Clipboard private key is incorrect", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Clipboard is empty", Toast.LENGTH_SHORT).show();
                 }
-
             } else{
                 Encryptor.privateKey = "1";
                 adapter.notifyDataSetChanged();
