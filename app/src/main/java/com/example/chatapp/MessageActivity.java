@@ -223,16 +223,15 @@ public class MessageActivity extends AppCompatActivity implements LogoutDialog.L
             final long timestamp = System.currentTimeMillis();
             final DatabaseReference senderPost = mDatabase.child(receiver_uid).push();
             final DatabaseReference senderRecentPost = UsersDatabase.child(mCurrentUser.getUid()).child("Contacts");
-            senderRecentPost.child(receiver_uid).removeValue(new DatabaseReference.CompletionListener() {
-                @Override
-                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                    DatabaseReference recentRef = senderRecentPost.child(receiver_uid);
-                    recentRef.child("content").setValue(senderEncryptedMessage);
-                    recentRef.child("contactId").setValue(receiver_uid);
-                    recentRef.child("timestamp").setValue(timestamp);
-                    recentRef.child("sender").setValue(1);
-                }
-            });
+
+            //Sends message to Contacts
+            DatabaseReference recentRef = senderRecentPost.child(receiver_uid);
+            recentRef.child("content").setValue(senderEncryptedMessage);
+            recentRef.child("contactId").setValue(receiver_uid);
+            recentRef.child("timestamp").setValue(timestamp);
+            recentRef.child("sender").setValue(1);
+
+            //Sends message to Messages
             senderPost.child("content").setValue(senderEncryptedMessage);
             senderPost.child("sender").setValue(1);
             senderPost.child("emoji").setValue(emoji);
@@ -243,16 +242,15 @@ public class MessageActivity extends AppCompatActivity implements LogoutDialog.L
             if(!receiver_uid.equals(mCurrentUser.getUid())) {
                 final DatabaseReference receiverPost = mReceiverRef.child(mUser.getUid()).push();
                 final DatabaseReference receiverRecentPost = UsersDatabase.child(receiver_uid).child("Contacts");
-                senderRecentPost.child(mCurrentUser.getUid()).removeValue(new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                        DatabaseReference recentRef = receiverRecentPost.child(mCurrentUser.getUid());
-                        recentRef.child("content").setValue(receiverEncryptedMessage);
-                        recentRef.child("contactId").setValue(mCurrentUser.getUid());
-                        recentRef.child("timestamp").setValue(timestamp);
-                        recentRef.child("sender").setValue(0);
-                    }
-                });
+
+                //Sends message to Contacts
+                recentRef = receiverRecentPost.child(mCurrentUser.getUid());
+                recentRef.child("content").setValue(receiverEncryptedMessage);
+                recentRef.child("contactId").setValue(mCurrentUser.getUid());
+                recentRef.child("timestamp").setValue(timestamp);
+                recentRef.child("sender").setValue(0);
+
+                //Sends message to Messages
                 receiverPost.child("content").setValue(receiverEncryptedMessage);
                 receiverPost.child("sender").setValue(0);
                 receiverPost.child("emoji").setValue(emoji);
