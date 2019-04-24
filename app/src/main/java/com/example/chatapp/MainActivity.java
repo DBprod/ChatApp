@@ -231,6 +231,11 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if(id == R.id.settingBtn){
+            Intent settingIntent = new Intent(MainActivity.this, SettingActivity.class);
+            startActivity(settingIntent);
+        }
+
         if (id == R.id.logoutBtn) {
             openLogoutDialog();
         }
