@@ -12,15 +12,33 @@
       android:background="@drawable/form_activity_background"
       >
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:text="Encrypted Chat App"
+        android:textColor="#FFFFFF"
+        android:textSize="35dp"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_lock_closed"
+        android:layout_marginTop="10dp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="70dp"
+        android:paddingBottom="20dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:paddingTop="10dp"
-        android:layout_marginTop="200dp"
+        android:paddingTop="20dp"
+        android:layout_marginTop="30dp"
         android:background="@drawable/form_bubble_shape"
 
         >
@@ -41,21 +59,12 @@
         />
 
     <Button
-        android:layout_width="350dp"
-        android:layout_height="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="#01FFFFFF"
-        android:gravity="right"
+        android:gravity="end"
         android:onClick="forgotPasswordBtnClicked"
         android:text="Forgot Password?"
-        android:textColor="#03A9F4" />
-
-    <Button
-        android:layout_width="350dp"
-        android:layout_height="32dp"
-        android:background="#01FFFFFF"
-        android:gravity="right"
-        android:onClick="createAccountBtnClicked"
-        android:text="Create an account?"
         android:textColor="#03A9F4" />
 
     <Button
@@ -63,7 +72,18 @@
         android:layout_height="wrap_content"
         android:onClick="loginButtonClicked"
         android:text="Login"
+        android:background="@drawable/button_background_login"
         />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:onClick="createAccountBtnClicked"
+            android:layout_marginTop="10dp"
+            android:text="Create an account"
+            android:background="@drawable/button_background_login"
+             />
 
 
     </LinearLayout>

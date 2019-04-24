@@ -8,13 +8,33 @@
               android:paddingBottom="10dp"
               android:paddingLeft="10dp"
               android:paddingRight="10dp"
-              android:paddingTop="100dp"
+              android:paddingTop="30dp"
+              android:background="@drawable/form_activity_background"
               >
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Create an account"
+        android:text="Create an Account"
+        android:gravity="center"
+        android:textSize="35dp"
+        android:textColor="#FFFFFF"
+        android:fontFamily="sans-serif-light"
         />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="20dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/form_bubble_shape"
+
+        >
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -49,11 +69,17 @@
         android:id="@+id/signupButton"
         android:text="Sign up"
         android:onClick="signupButtonClicked"
+        android:background="@drawable/button_background_login"
+        android:layout_marginTop="10dp"
         />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Login"
         android:onClick="loginButtonClicked"
+        android:background="@drawable/button_background_login"
+        android:layout_marginTop="10dp"
         />
+
+    </LinearLayout>
 </LinearLayout>
