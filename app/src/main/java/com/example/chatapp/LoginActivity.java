@@ -43,6 +43,8 @@ public class LoginActivity extends AppCompatActivity {
 
         preferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
         prefEditor = preferences.edit();
+
+        getSupportActionBar().setTitle("Login");
     }
     public void loginButtonClicked(View view) {
         String email = loginEmail.getText().toString().trim();
