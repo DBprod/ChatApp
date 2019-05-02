@@ -73,4 +73,15 @@
         </LinearLayout>
     </ScrollView>
 
+    <Button
+        android:id="@+id/button"
+        android:layout_width="87dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="240dp"
+        android:text="Button"
+        android:onClick="onSelectClicked"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
