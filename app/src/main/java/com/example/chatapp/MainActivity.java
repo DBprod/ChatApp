@@ -5,12 +5,16 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,11 +24,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -33,7 +41,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 
 public class MainActivity extends AppCompatActivity implements LogoutDialog.LogoutDialogListener {
@@ -137,6 +152,73 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
                 @Override
                 public PeopleHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
                     View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.single_contact, viewGroup, false);
+
+                    final ImageView profilePic = view.findViewById(R.id.imageView3);
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference myRef1 = database.getReference("imageURL/potat");;
+                    final File[] localFile = new File[1];
+                    final StorageReference storageref = FirebaseStorage.getInstance().getReference();
+                    myRef1.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            // This method is called once with the initial value and again
+                            // whenever data at this location is updated.
+                            try {
+                                localFile[0] = File.createTempFile("images", "jpg");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                localFile[0] = null;
+                                return;
+                            }
+                            storageref.child("images/fdsa.jpg").getFile(localFile[0])
+                                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                            // Successfully downloaded data to local file
+                                            // ...
+                                            Picasso.with(MainActivity.this).load(localFile[0]).resize(70,70).centerCrop().into(profilePic, new Callback() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    Bitmap imgbmap = ((BitmapDrawable) profilePic.getDrawable()).getBitmap();
+                                                    RoundedBitmapDrawable imgDrawable = RoundedBitmapDrawableFactory.create(getResources(), imgbmap);
+                                                    imgDrawable.setCircular(true);
+                                                    imgDrawable.setCornerRadius(35);
+                                                    profilePic.setImageDrawable(imgDrawable);
+                                                }
+                                                @Override
+                                                public void onError() {
+                                                }
+                                            });
+
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(Exception exception) {
+                                    // Handle failed download
+                                    // ...
+                                }
+                            });
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                        }
+                    });
+                    if(localFile[0]==null) {
+                        Picasso.with(MainActivity.this).load(R.drawable.avatar_icon).resize(70, 70).centerCrop().into(profilePic, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Bitmap imgbmap = ((BitmapDrawable) profilePic.getDrawable()).getBitmap();
+                                RoundedBitmapDrawable imgDrawable = RoundedBitmapDrawableFactory.create(getResources(), imgbmap);
+                                imgDrawable.setCircular(true);
+                                imgDrawable.setCornerRadius(35);
+                                profilePic.setImageDrawable(imgDrawable);
+                            }
+
+                            @Override
+                            public void onError() {
+                            }
+                        });
+                    }
                     return new PeopleHolder(view);
                 }
             };

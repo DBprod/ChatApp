@@ -59,11 +59,6 @@ public class SettingActivity extends AppCompatActivity {
                 .commit();
 
 
-
-
-
-
-
         final ImageView profilePic = findViewById(R.id.imageView4);
         myRef = database.getReference("imageURL/potat");//change this to where it's stored in the database
         Picasso.with(this).load(R.drawable.avatar_icon).resize(70,70).centerCrop().into(profilePic, new Callback() {
@@ -74,7 +69,6 @@ public class SettingActivity extends AppCompatActivity {
                 imgDrawable.setCircular(true);
                 imgDrawable.setCornerRadius(35);
                 profilePic.setImageDrawable(imgDrawable);
-
             }
             @Override
             public void onError() {
@@ -96,6 +90,7 @@ public class SettingActivity extends AppCompatActivity {
                     localFile = File.createTempFile("images", "jpg");
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return;
                 }
                 storageref.child("images/fdsa.jpg").getFile(localFile)
                         .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
