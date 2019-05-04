@@ -59,13 +59,8 @@ public class SettingActivity extends AppCompatActivity {
                 .commit();
 
 
-
-
-
-
-
         final ImageView profilePic = findViewById(R.id.imageView4);
-        myRef = database.getReference("imageURL/potat");//change this to where it's stored in the database
+        myRef = database.getReference("imageURL/potat");//replace with users/uid/image
         Picasso.with(this).load(R.drawable.avatar_icon).resize(70,70).centerCrop().into(profilePic, new Callback() {
             @Override
             public void onSuccess() {
@@ -74,7 +69,6 @@ public class SettingActivity extends AppCompatActivity {
                 imgDrawable.setCircular(true);
                 imgDrawable.setCornerRadius(35);
                 profilePic.setImageDrawable(imgDrawable);
-
             }
             @Override
             public void onError() {
@@ -96,8 +90,9 @@ public class SettingActivity extends AppCompatActivity {
                     localFile = File.createTempFile("images", "jpg");
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return;
                 }
-                storageref.child("images/fdsa.jpg").getFile(localFile)
+                storageref.child("images/fdsa.jpg").getFile(localFile) // replace fdsa with uid
                         .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
@@ -163,7 +158,7 @@ public class SettingActivity extends AppCompatActivity {
                         imgDrawable.setCornerRadius(35);
                         img.setImageDrawable(imgDrawable);
                         ayyyy=1;
-                        StorageReference imgRef = storageref.child("images/fdsa.jpg");
+                        StorageReference imgRef = storageref.child("images/fdsa.jpg");//replace fdsa with uid;
 
                         imgRef.putFile(finalSelectedUri)
                                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
