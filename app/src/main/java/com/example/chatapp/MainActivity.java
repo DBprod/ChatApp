@@ -47,6 +47,8 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -102,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
             mContactList.setLayoutManager(linearLayoutManager);
             getSupportActionBar().setTitle("Your Messages");
         }
+
     }
 
     @Override
@@ -111,9 +114,74 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
             Query query = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid()).child("Contacts").orderByChild("timestamp");
             FirebaseRecyclerOptions<People> options = new FirebaseRecyclerOptions.Builder<People>().setQuery(query, People.class).build();
             adapter = new FirebaseRecyclerAdapter<People, PeopleHolder>(options) {
+
                 @Override
                 protected void onBindViewHolder(@NonNull final PeopleHolder holder, int position, @NonNull People model) {
                     final String uid = model.getContactId();
+
+
+
+
+
+
+
+                    final String id1 = uid;
+                    final ImageView profilePic = holder.mView.findViewById(R.id.imageView3);
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference myRef1 = database.getReference("Users/"+id1+"/image");//replace with users/uid/image
+                    final File[] localFile = new File[1];
+                    final StorageReference storageref = FirebaseStorage.getInstance().getReference();
+                    myRef1.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            // This method is called once with the initial value and again
+                            // whenever data at this location is updated.
+                            try {
+                                localFile[0] = File.createTempFile("image", "jpg");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                localFile[0] = null;
+                                return;
+                            }
+                            storageref.child("images/"+id1+".jpg").getFile(localFile[0])//replace fdsa with uid
+                                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                            // Successfully downloaded data to local file
+                                            // ...
+                                            Picasso.with(getBaseContext()).load(localFile[0]).resize(70,70).centerCrop().into(profilePic, new Callback() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    Bitmap imgbmap = ((BitmapDrawable) profilePic.getDrawable()).getBitmap();
+                                                    RoundedBitmapDrawable imgDrawable = RoundedBitmapDrawableFactory.create(getResources(), imgbmap);
+                                                    imgDrawable.setCircular(true);
+                                                    imgDrawable.setCornerRadius(35);
+                                                    profilePic.setImageDrawable(imgDrawable);
+                                                }
+                                                @Override
+                                                public void onError() {
+                                                }
+                                            });
+
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(Exception exception) {
+                                    // Handle failed download
+                                    // ...
+                                }
+                            });
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                        }
+                    });
+
+
+
+
+
+
                     String recentMessage = Encryptor.decrypt(model.getContent(), myPublicKey, new BigInteger(Encryptor.privateKey));
                     if(model.getSender() == 1){
                         recentMessage = "You: " + recentMessage;
@@ -153,73 +221,22 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
                 public PeopleHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
                     View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.single_contact, viewGroup, false);
 
-                    final ImageView profilePic = view.findViewById(R.id.imageView3);
-                    FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    DatabaseReference myRef1 = database.getReference("imageURL/potat");//replace with users/uid/image
-                    final File[] localFile = new File[1];
-                    final StorageReference storageref = FirebaseStorage.getInstance().getReference();
-                    myRef1.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            // This method is called once with the initial value and again
-                            // whenever data at this location is updated.
-                            try {
-                                localFile[0] = File.createTempFile("images", "jpg");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                localFile[0] = null;
-                                return;
-                            }
-                            storageref.child("images/fdsa.jpg").getFile(localFile[0])//replace fdsa with uid
-                                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                            // Successfully downloaded data to local file
-                                            // ...
-                                            Picasso.with(MainActivity.this).load(localFile[0]).resize(70,70).centerCrop().into(profilePic, new Callback() {
-                                                @Override
-                                                public void onSuccess() {
-                                                    Bitmap imgbmap = ((BitmapDrawable) profilePic.getDrawable()).getBitmap();
-                                                    RoundedBitmapDrawable imgDrawable = RoundedBitmapDrawableFactory.create(getResources(), imgbmap);
-                                                    imgDrawable.setCircular(true);
-                                                    imgDrawable.setCornerRadius(35);
-                                                    profilePic.setImageDrawable(imgDrawable);
-                                                }
-                                                @Override
-                                                public void onError() {
-                                                }
-                                            });
 
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(Exception exception) {
-                                    // Handle failed download
-                                    // ...
-                                }
-                            });
-                        }
+                    final ImageView profilePic = view.findViewById(R.id.imageView3);
+                    Picasso.with(MainActivity.this).load(R.drawable.avatar_icon).resize(70, 70).centerCrop().into(profilePic, new Callback() {
                         @Override
-                        public void onCancelled(DatabaseError error) {
+                        public void onSuccess() {
+                            Bitmap imgbmap = ((BitmapDrawable) profilePic.getDrawable()).getBitmap();
+                            RoundedBitmapDrawable imgDrawable = RoundedBitmapDrawableFactory.create(getResources(), imgbmap);
+                            imgDrawable.setCircular(true);
+                            imgDrawable.setCornerRadius(35);
+                            profilePic.setImageDrawable(imgDrawable);
+                        }
+
+                        @Override
+                        public void onError() {
                         }
                     });
-                    if(localFile[0]==null) {
-                        Picasso.with(MainActivity.this).load(R.drawable.avatar_icon).resize(70, 70).centerCrop().into(profilePic, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                Bitmap imgbmap = ((BitmapDrawable) profilePic.getDrawable()).getBitmap();
-                                RoundedBitmapDrawable imgDrawable = RoundedBitmapDrawableFactory.create(getResources(), imgbmap);
-                                imgDrawable.setCircular(true);
-                                imgDrawable.setCornerRadius(35);
-                                profilePic.setImageDrawable(imgDrawable);
-                            }
-
-                            @Override
-                            public void onError() {
-                            }
-                        });
-                    }
-
                     return new PeopleHolder(view);
                 }
             };
@@ -293,11 +310,17 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
             nameView.setText(username);
         }
 
-        public void setContent(String content){
+        public void setContent(String content) {
             TextView contentView = mView.findViewById(R.id.recentMessage);
             contentView.setText(content);
         }
+
     }
+
+    public void setpic(View mView){
+
+    }
+
 
     // create an action bar button
     @Override
@@ -316,6 +339,7 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
 
         if(id == R.id.settingBtn){
             Intent settingIntent = new Intent(MainActivity.this, SettingActivity.class);
+            settingIntent.putExtra("uid",mAuth.getCurrentUser().getUid());
             startActivity(settingIntent);
         }
 
