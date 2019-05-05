@@ -37,6 +37,8 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -102,7 +104,26 @@ public class SettingActivity extends AppCompatActivity {
 
         Intent adsf = getIntent();
         uid = adsf.getStringExtra("uid");
+        TextView uid1 = findViewById(R.id.uidText);
+        uid1.setText("ID: " +uid);
         final ImageView profilePic = findViewById(R.id.imageView4);
+
+        final TextView name = findViewById(R.id.nameText);
+
+        myRef = database.getReference("Users/" + uid + "/name");
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                name.setText("Name: " + dataSnapshot.getValue().toString());
+            }
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        });
+
+
+
+
         myRef = database.getReference("Users/" + uid + "/image");//replace with users/uid/image
         Picasso.with(this).load(R.drawable.avatar_icon).resize(70,70).centerCrop().into(profilePic, new Callback() {
             @Override
