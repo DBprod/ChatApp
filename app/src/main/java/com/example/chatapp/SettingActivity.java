@@ -2,6 +2,7 @@ package com.example.chatapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -16,6 +17,8 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,22 +39,60 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class SettingActivity extends AppCompatActivity {
 
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private static FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef;
     File localFile = null;
     private StorageReference storageref = FirebaseStorage.getInstance().getReference();
     int ayyyy = 0;
-    String uid;
+    private static String uid;
+
+    public static class SettingFrame extends PreferenceFragmentCompat {
+        private SharedPreferences preferences;
+        private SharedPreferences.Editor prefEditor;
+        @Override
+        public void onCreatePreferences(Bundle bundle, String s) {
+            setPreferencesFromResource(R.xml.setting, s);
+            android.support.v7.preference.Preference myPref = findPreference("forgotKey");
+            preferences = getContext().getSharedPreferences("Settings", Context.MODE_PRIVATE);
+            prefEditor = preferences.edit();
+            myPref.setOnPreferenceClickListener(new android.support.v7.preference.Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+
+                    database.getReference().child("Messages").child(uid).removeValue();
+                    DatabaseReference current_user_db = database.getReference().child("Users");
+                    BigInteger[] primes = Encryptor.generatePrimes();
+                    BigInteger[] publicKey = Encryptor.generatePublicKey(primes[0], primes[1]);
+
+                    // Public key logic and storing into database
+                    String mod = publicKey[0].toString();
+                    String exp = publicKey[1].toString();
+                    current_user_db.child("mod").setValue(mod);
+                    current_user_db.child("exp").setValue(exp);
+                    prefEditor.putString("mod", mod).commit();
+                    prefEditor.putString("exp", exp).commit();
+
+                    //Generating private key to send to the private key activity
+                    String privateKey = Encryptor.generatePrivateKey(publicKey, primes[0], primes[1]).toString();
+
+                    Intent privateKeyIntent = new Intent(getContext(), PrivateKeyActivity.class);
+                    privateKeyIntent.putExtra("privateKey", privateKey);
+                    startActivity(privateKeyIntent);
+                    return true;
+                }
+            });
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_setting);
         getSupportFragmentManager()
                 .beginTransaction()
