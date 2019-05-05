@@ -68,7 +68,7 @@ public class SettingActivity extends AppCompatActivity {
                 public boolean onPreferenceClick(Preference preference) {
 
                     database.getReference().child("Messages").child(uid).removeValue();
-                    DatabaseReference current_user_db = database.getReference().child("Users");
+                    DatabaseReference current_user_db = database.getReference().child("Users").child(uid);
                     BigInteger[] primes = Encryptor.generatePrimes();
                     BigInteger[] publicKey = Encryptor.generatePublicKey(primes[0], primes[1]);
 
@@ -77,7 +77,7 @@ public class SettingActivity extends AppCompatActivity {
                     String exp = publicKey[1].toString();
                     current_user_db.child("mod").setValue(mod);
                     current_user_db.child("exp").setValue(exp);
-                    prefEditor.putString("mod", mod).commit();
+                    prefEditor.putString("mod", mod).apply();
                     prefEditor.putString("exp", exp).commit();
 
                     //Generating private key to send to the private key activity
