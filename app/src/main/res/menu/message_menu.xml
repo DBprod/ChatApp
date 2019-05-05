@@ -9,6 +9,11 @@
         />
 
     <item
+        android:id="@+id/settingBtn"
+        android:title="Settings"
+        />
+
+    <item
         android:id="@+id/uidBtn"
         android:title="Get your ID"
         />

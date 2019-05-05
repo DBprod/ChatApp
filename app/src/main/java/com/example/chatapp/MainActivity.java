@@ -118,13 +118,6 @@ public class MainActivity extends AppCompatActivity implements LogoutDialog.Logo
                 @Override
                 protected void onBindViewHolder(@NonNull final PeopleHolder holder, int position, @NonNull People model) {
                     final String uid = model.getContactId();
-
-
-
-
-
-
-
                     final String id1 = uid;
                     final ImageView profilePic = holder.mView.findViewById(R.id.imageView3);
                     FirebaseDatabase database = FirebaseDatabase.getInstance();

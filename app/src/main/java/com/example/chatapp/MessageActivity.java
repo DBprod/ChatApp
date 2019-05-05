@@ -278,6 +278,12 @@ public class MessageActivity extends AppCompatActivity implements LogoutDialog.L
             openLogoutDialog();
         }
 
+        if(id == R.id.settingBtn){
+            Intent settingIntent = new Intent(MessageActivity.this, SettingActivity.class);
+            settingIntent.putExtra("uid",mAuth.getCurrentUser().getUid());
+            startActivity(settingIntent);
+        }
+
         if (id == R.id.uidBtn){
             ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("uid", mAuth.getCurrentUser().getUid());

@@ -32,15 +32,16 @@
 
                 <ImageView
                     android:id="@+id/imageView4"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
                     android:layout_weight="0"
+                    android:onClick="onSelectClicked"
                     app:srcCompat="@drawable/avatar_icon" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="15dp"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
@@ -49,16 +50,18 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="Name" />
+                        android:gravity="center|left"
+                        android:text="Name"
+                        android:textSize="16sp" />
 
                     <TextView
                         android:id="@+id/uidText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="left"
-                        android:text="UID" />
+                        android:gravity="center|left"
+                        android:text="UID"
+                        android:textSize="16sp" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -67,21 +70,11 @@
                 android:id="@+id/settingContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:layout_marginLeft="-70dp"/>
+                android:layout_marginLeft="-70dp"
+                android:layout_marginTop="15dp"
+                android:layout_weight="0" />
 
         </LinearLayout>
     </ScrollView>
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="87dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="72dp"
-        android:layout_marginTop="240dp"
-        android:text="Button"
-        android:onClick="onSelectClicked"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
